@@ -12,7 +12,6 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <style>
-    /* PALETA OFICIAL MODERNA (Mais limpa, com sombras suaves) */
     :root { 
       --primaria: #F97316; 
       --primaria-hover: #EA580C;
@@ -38,7 +37,6 @@
     
     .escondido { display: none !important; }
     
-    /* Cronômetro e Área de Prova */
     .relogio-teste { font-size: 28px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 12px 45px; border-radius: 50px; display: inline-block; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 2px;}
     .progress { background-color: #E2E8F0; border: none; height: 20px; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
     .progress-bar { background: linear-gradient(90deg, var(--secundaria), var(--primaria)); transition: width 0.5s ease; border-radius: 10px; }
@@ -48,7 +46,6 @@
     
     .box-info { background-color: #FFFBEB; border-left: 5px solid var(--secundaria); padding: 20px; border-radius: 12px; color: var(--marrom-suave); font-size: 16px; margin-bottom: 24px;}
     
-    /* Prevenção de Seleção de Texto (Anti-cola visual) */
     .noselect { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
   </style>
 </head>
@@ -73,8 +70,6 @@
 
   <!-- TELA DASHBOARD (ATIVIDADES) -->
   <div id="telaDashboard" class="container py-4 escondido" style="max-width: 1000px;">
-    
-    <!-- Cabeçalho Dinâmico -->
     <div class="d-flex justify-content-between align-items-center mb-4 card-3d card-topo-amarelo py-4" style="background: linear-gradient(to right, #ffffff, #FFFBEB);">
       <div class="d-flex align-items-center gap-4">
         <div class="bg-white shadow-sm p-3 rounded-circle text-center border" style="width: 70px; height: 70px; line-height: 35px;">
@@ -112,7 +107,12 @@
     <div class="card-3d card-topo-laranja text-center p-5">
        <i class="fas fa-bullhorn mb-3" style="font-size: 60px; color: var(--secundaria);"></i>
        <h2 class="fw-bold mb-2 text-dark" id="infoTituloProva">Título da Prova</h2>
-       <p class="text-muted fs-5 mb-5">Leia as instruções atentamente antes de iniciar.</p>
+       
+       <!-- ÁREA RESERVADA PARA OS ALERTAS QUE VOCÊ VAI MANDAR -->
+       <div id="areaAlertasDinamicos" class="text-start mt-4 mb-4 p-4 rounded bg-light border border-warning shadow-sm">
+           <h5 class="fw-bold text-dark mb-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i> Instruções e Regras:</h5>
+           <p class="text-muted mb-0"><em>(Espaço reservado. Cole as instruções e os alertas específicos aqui quando me enviar o texto.)</em></p>
+       </div>
        
        <div class="row text-start mb-5 g-4">
           <div class="col-md-6">
@@ -138,10 +138,8 @@
     </div>
   </div>
 
-  <!-- TELA DE EXECUÇÃO DA PROVA (AMBIENTE CONTROLADO E SEGURO) -->
+  <!-- TELA DE EXECUÇÃO DA PROVA -->
   <div id="telaExecucaoProva" class="container py-4 escondido noselect" style="max-width: 950px;">
-    
-    <!-- Cabeçalho da Prova (Com botão Salvar e Sair) -->
     <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-pill shadow-sm border">
         <div class="ms-3 fw-bold text-dark fs-5"><i class="fas fa-book-open me-2" style="color: var(--primaria);"></i> <span id="tituloProvaExecucao">Atividade</span></div>
         <button class="btn btn-outline-danger fw-bold rounded-pill" onclick="pausarEGuardar()">
@@ -149,7 +147,6 @@
         </button>
     </div>
 
-    <!-- Cronômetro e Progresso -->
     <div class="mb-4 text-center">
       <div class="relogio-teste mx-auto mb-4" id="relogioTeste"><i class="fas fa-stopwatch"></i> 0s</div>
       
@@ -162,7 +159,6 @@
       </div>
     </div>
 
-    <!-- Área da Questão -->
     <div id="areaQuestaoAtiva" class="card-3d shadow mb-4" style="border-top-width: 6px; border-top-color: var(--secundaria); min-height: 300px;">
       <!-- HTML da Questão Injetado Aqui -->
     </div>
@@ -188,39 +184,45 @@
     let tempoRestante = 0;
     let timerIntervalo = null;
 
-    // BLOQUEIOS ANTI-COLA E MUDANÇA DE ABA
-    
-    // 1. Bloqueia Copiar e Colar dentro da execução
+    // BLOQUEIOS ANTI-COLA E MUDANÇA DE ABA (CORRIGIDO)
     document.addEventListener('copy', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
     document.addEventListener('cut', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
     document.addEventListener('paste', function(e) { 
         if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) {
-            e.preventDefault();
-            Swal.fire('Bloqueado!', 'A função de colar texto não é permitida nesta atividade.', 'error');
+            e.preventDefault(); Swal.fire('Bloqueado!', 'A função de colar texto não é permitida nesta atividade.', 'error');
         } 
     });
 
-    // 2. Alerta Vermelho de Troca de Aba (Foco)
     document.addEventListener("visibilitychange", () => {
         if (document.hidden && !document.getElementById('telaExecucaoProva').classList.contains('escondido')) {
-             // Punição: Volta o tempo da questão pro início
-             const q = cadernoAtivo.questoesOriginal[indiceAtual];
-             tempoRestante = parseInt(q.tempo || 60);
-             atualizarRelogioHTML();
+             // 1. PAUSA O CRONÔMETRO IMEDIATAMENTE AO SAIR DA ABA
+             clearInterval(timerIntervalo);
              
+             // 2. MOSTRA O ALERTA E AGUARDA O ALUNO CLICAR "ESTOU CIENTE"
              Swal.fire({
                 title: '⚠️ ALERTA DE FOCO!',
                 html: 'Você saiu da aba da atividade.<br><br>Como regra de segurança, <b>o tempo desta questão foi reiniciado</b>. Mantenha o foco até concluir!',
                 icon: 'error',
                 allowOutsideClick: false,
                 confirmButtonColor: 'var(--perigo)',
-                confirmButtonText: 'Entendi, vou focar'
+                confirmButtonText: 'Estou ciente, vou focar'
+             }).then((result) => {
+                if (result.isConfirmed) {
+                    // 3. SOMENTE AGORA O TEMPO RESSIGNIFICA E VOLTA A CONTAR
+                    const q = cadernoAtivo.questoesOriginal[indiceAtual];
+                    tempoRestante = parseInt(q.tempo || 60);
+                    
+                    const btn = document.getElementById('btnAvancar');
+                    btn.disabled = true;
+                    btn.className = "btn btn-secondary w-100 shadow fw-bold mb-3";
+                    
+                    atualizarRelogioHTML();
+                    timerIntervalo = setInterval(tickTempo, 1000);
+                }
              });
         }
     });
 
-
-    // INICIALIZAÇÃO
     window.onload = function() {
       const sessaoSalva = localStorage.getItem('alunoLogado_LMS');
       if (sessaoSalva) {
@@ -251,7 +253,6 @@
       document.getElementById('textoSaudacao').innerHTML = `${cumprimento}, <strong style="color: var(--primaria);">${nome}</strong>! 🚀`;
     }
 
-    // LOGIN
     function fazerLoginAluno() {
       const matricula = document.getElementById('inputMatricula').value.trim();
       if(!matricula) return;
@@ -271,9 +272,7 @@
             montarSaudacao(resp.nome);
             alternarTela('telaDashboard');
             carregarAtividadesPendentes();
-          } else {
-            Swal.fire('Acesso Negado', resp.msg, 'error');
-          }
+          } else { Swal.fire('Acesso Negado', resp.msg, 'error'); }
         }).catch(err => {
           btn.innerHTML = 'Acessar Portal <i class="fas fa-rocket ms-2"></i>';
           btn.disabled = false;
@@ -281,7 +280,6 @@
         });
     }
 
-    // BUSCAR PAINEL
     function carregarAtividadesPendentes() {
       const containerEmAndamento = document.getElementById('listaEmAndamento');
       const containerPendentes = document.getElementById('listaPendentes');
@@ -294,33 +292,22 @@
         .then(painel => {
           painelCompleto = painel;
           
-          containerEmAndamento.innerHTML = '';
-          containerPendentes.innerHTML = '';
-          containerConcluidas.innerHTML = '';
+          containerEmAndamento.innerHTML = ''; containerPendentes.innerHTML = ''; containerConcluidas.innerHTML = '';
 
-          // 1. EM ANDAMENTO
           document.getElementById('sessaoEmAndamento').classList.remove('escondido');
           if(painel.em_andamento && painel.em_andamento.length > 0) {
             painel.em_andamento.forEach(ativ => containerEmAndamento.innerHTML += gerarCardHTML(ativ, 'andamento'));
-          } else {
-            containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-pause-circle fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pausada.</div>';
-          }
+          } else { containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-pause-circle fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pausada.</div>'; }
 
-          // 2. PENDENTES (A FAZER)
           document.getElementById('sessaoPendentes').classList.remove('escondido');
           if(painel.a_fazer && painel.a_fazer.length > 0) {
              painel.a_fazer.forEach(ativ => containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer'));
-          } else {
-             containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pendente. Tudo em dia!</div>';
-          }
+          } else { containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pendente. Tudo em dia!</div>'; }
 
-          // 3. CONCLUÍDAS (BOLETIM)
           document.getElementById('sessaoConcluidas').classList.remove('escondido');
           if(painel.concluidas && painel.concluidas.length > 0) {
              painel.concluidas.forEach(ativ => containerConcluidas.innerHTML += gerarCardHTML(ativ, 'concluida'));
-          } else {
-             containerConcluidas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-medal fs-3 mb-2 opacity-50"></i><br>Boletim vazio. Finalize uma atividade primeiro.</div>';
-          }
+          } else { containerConcluidas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-medal fs-3 mb-2 opacity-50"></i><br>Boletim vazio. Finalize uma atividade primeiro.</div>'; }
         });
     }
 
@@ -333,9 +320,7 @@
           <div class="col-md-6">
             <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--secundaria);">
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="mb-4 small text-muted">
-                <i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
-              </div>
+              <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
               <button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave);" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
                  <i class="fas fa-play me-2"></i> Continuar Prova
               </button>
@@ -346,9 +331,7 @@
           <div class="col-md-6">
             <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--primaria);">
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="mb-4 small text-muted">
-                <i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
-              </div>
+              <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
               <button class="btn btn-primario w-100 fw-bold mt-auto" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
                  <i class="fas fa-pen me-2"></i> Iniciar Agora
               </button>
@@ -359,22 +342,16 @@
           <div class="col-md-6">
             <div class="p-4 bg-white border rounded shadow-sm h-100" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="p-3 text-center rounded fw-bold fs-5 mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">
-                 Nota Recebida: ${ativ.nota || 'Aguardando'}
-              </div>
+              <div class="p-3 text-center rounded fw-bold fs-5 mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Nota Recebida: ${ativ.nota || 'Aguardando'}</div>
             </div>
           </div>`;
       }
     }
 
-    // TELA DE INSTRUÇÕES
     function abrirInstrucoes(linhaPlanilha) {
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
       cadernoAtivo = pendentes.find(p => p.linhaPlanilha === linhaPlanilha);
-      
-      if(!cadernoAtivo || !cadernoAtivo.questoesOriginal || cadernoAtivo.questoesOriginal.length === 0) {
-          Swal.fire('Atenção', 'Questões indisponíveis.', 'warning'); return;
-      }
+      if(!cadernoAtivo || !cadernoAtivo.questoesOriginal || cadernoAtivo.questoesOriginal.length === 0) { Swal.fire('Atenção', 'Questões indisponíveis.', 'warning'); return; }
 
       document.getElementById('infoTituloProva').innerText = cadernoAtivo.titulo;
       document.getElementById('infoQtdQuestoes').innerText = cadernoAtivo.questoesOriginal.length;
@@ -383,9 +360,19 @@
       alternarTela('telaInstrucoes');
     }
 
-    // INICIAR DE FATO
     function prepararExecucao() {
-      // Se tiver rascunho salvo (em andamento), recupera. Se não, cria array vazio.
+      // 1. SILENT SAVE: Move a atividade de Pendente para Em Andamento no servidor na hora que clica em "Começar"
+      fetch(URL_API_GOOGLE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+              api: 'salvarProgresso',
+              linhaPlanilha: cadernoAtivo.linhaPlanilha,
+              respostas: cadernoAtivo.respostasSalvas || [], // Envia array vazio ou o que já tinha
+              tempoRestante: 0 
+          })
+      }); // Chamada em background, não atrapalha o carregamento.
+
       if (cadernoAtivo.respostasSalvas && cadernoAtivo.respostasSalvas.length === cadernoAtivo.questoesOriginal.length) {
           respostasAluno = cadernoAtivo.respostasSalvas;
       } else {
@@ -393,31 +380,23 @@
           respostasAluno = new Array(cadernoAtivo.questoesOriginal.length).fill(null);
       }
       
-      // Acha a primeira questão que ele ainda não respondeu para pular direto pra ela
       indiceAtual = respostasAluno.findIndex(r => r === null || r === "");
-      if(indiceAtual === -1) indiceAtual = 0; // Se tudo estiver preenchido (bug), volta pra 0
+      if(indiceAtual === -1) indiceAtual = 0; 
 
       alternarTela('telaExecucaoProva');
       renderizarQuestao();
     }
 
-    // RENDERIZAR QUESTÃO
     function renderizarQuestao() {
-      if(indiceAtual >= cadernoAtivo.questoesOriginal.length) { 
-          finalizarEEnviarProva(); 
-          return; 
-      }
+      if(indiceAtual >= cadernoAtivo.questoesOriginal.length) { finalizarEEnviarProva(); return; }
       
       const q = cadernoAtivo.questoesOriginal[indiceAtual];
       tempoRestante = parseInt(q.tempo || 60);
       
-      let numAtual = indiceAtual + 1;
-      let totalQ = cadernoAtivo.questoesOriginal.length;
-      let pct = Math.round(((indiceAtual) / totalQ) * 100);
+      let numAtual = indiceAtual + 1; let totalQ = cadernoAtivo.questoesOriginal.length; let pct = Math.round(((indiceAtual) / totalQ) * 100);
       
       document.getElementById('textoProgresso').innerText = 'Questão ' + numAtual + ' de ' + totalQ;
-      document.getElementById('percentualProgresso').innerText = pct + '%';
-      document.getElementById('barraProgresso').style.width = pct + '%';
+      document.getElementById('percentualProgresso').innerText = pct + '%'; document.getElementById('barraProgresso').style.width = pct + '%';
       
       let html = '<div class="p-4">';
       
@@ -425,9 +404,7 @@
           if (q.midia.includes('youtube.com') || q.midia.includes('youtu.be')) {
               let vid = q.midia.includes('v=') ? q.midia.split('v=')[1].split('&')[0] : q.midia.split('youtu.be/')[1].split('?')[0];
               html += `<div class="text-center mb-4"><iframe width="100%" height="315" src="https://www.youtube.com/embed/${vid}" frameborder="0" allowfullscreen class="rounded border shadow-sm"></iframe></div>`;
-          } else {
-              html += `<div class="text-center mb-4"><img src="${q.midia}" class="img-fluid rounded border shadow-sm" style="max-height: 350px;"></div>`;
-          }
+          } else { html += `<div class="text-center mb-4"><img src="${q.midia}" class="img-fluid rounded border shadow-sm" style="max-height: 350px;"></div>`; }
       }
 
       if(q.tipo === "estudo_caso") html += '<div class="estudo-caso-box shadow-sm">' + (q.contexto || "").replace(/\n/g, '<br>') + '</div>';
@@ -435,33 +412,24 @@
       if(q.tipo === "lacunas") {
         let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:45px;" oninput="verificarPreenchimento()">');
         html += '<p class="fw-bold mb-4 text-dark fs-5">' + enunciadoFmt + '</p>';
-      } else if(q.tipo !== "assercao_razao") {
-        html += '<p class="fw-bold mb-4 text-dark fs-4" style="line-height: 1.5;">' + (q.enunciado || "") + '</p>';
-      }
+      } else if(q.tipo !== "assercao_razao") { html += '<p class="fw-bold mb-4 text-dark fs-4" style="line-height: 1.5;">' + (q.enunciado || "") + '</p>'; }
 
       if (q.tipo === "multipla_escolha") {
         ['A','B','C','D','E'].forEach(l => { 
-            if(q.opcoes && q.opcoes[l]) {
-                html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3 mt-1" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100 fs-5" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; 
-            }
+            if(q.opcoes && q.opcoes[l]) { html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3 mt-1" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100 fs-5" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; }
         });
       } else if (q.tipo === "certo_errado") {
         html += `<div class="d-flex gap-4 mb-3"><div class="form-check p-4 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Certo" id="opt_C" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-success w-100 fs-4" for="opt_C" style="cursor:pointer;">CERTO</label></div><div class="form-check p-4 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Errado" id="opt_E" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-danger w-100 fs-4" for="opt_E" style="cursor:pointer;">ERRADO</label></div></div>`;
       } else if (q.tipo === "assercao_razao") {
         html += `<div class="bg-light p-4 rounded mb-4 border shadow-sm"><p class="mb-2 fw-bold fs-5">I. ${q.assercao}</p><div class="text-danger fw-bold my-3 text-center"><i class="fas fa-link"></i> PORQUE</div><p class="mb-0 fw-bold fs-5">II. ${q.razao}</p></div>`;
         let assOpcoes = [ {v: "I", t: "I. A afirmação I é verdadeira, e a II é verdadeira, e a II justifica a I."}, {v: "II", t: "II. A afirmação I é verdadeira, e a II é verdadeira, mas a II não justifica a I."}, {v: "III", t: "III. A afirmação I é verdadeira, e a II é falsa."}, {v: "IV", t: "IV. A afirmação I é falsa, e a II é verdadeira."}, {v: "V", t: "V. A afirmação I é falsa, e a II é falsa."} ];
-        assOpcoes.forEach(op => {
-            html += `<div class="form-check mb-3 p-3 rounded bg-light border"><input class="form-check-input ms-1 me-3 mt-1" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label fs-6" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`;
-        });
+        assOpcoes.forEach(op => { html += `<div class="form-check mb-3 p-3 rounded bg-light border"><input class="form-check-input ms-1 me-3 mt-1" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label fs-6" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`; });
       } else if (q.tipo === "associacao") {
-        html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`;
-        (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm fs-5"><strong>${idx+1}.</strong> ${item}</div>`; });
-        html += `</div><div class="col-sm-7 ps-4">`;
+        html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`; (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm fs-5"><strong>${idx+1}.</strong> ${item}</div>`; }); html += `</div><div class="col-sm-7 ps-4">`;
         (q.colunaB || []).forEach((item, idx) => { 
           let dItem = (q.b_is_img && item.startsWith('http')) ? `<img src="${item}" class="rounded border" style="max-height:60px;">` : `<span class="fw-bold fs-5">${item}</span>`;
           html += `<div class="d-flex align-items-center mb-3 bg-white p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:50px; height:50px; font-size:20px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
-        });
-        html += `</div></div>`;
+        }); html += `</div></div>`;
       } else if (q.tipo === "ordenacao") {
         q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark fs-5">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:60px; height:50px; font-size:20px;" oninput="verificarPreenchimento()"></div></div>`; });
       } else if (q.tipo === "verdadeiro_falso_mult") {
@@ -479,11 +447,14 @@
       
       clearInterval(timerIntervalo);
       timerIntervalo = setInterval(tickTempo, 1000);
+      
+      // Força verificação caso não tenha campo de input (ex: apenas leitura se houver erro)
+      verificarPreenchimento();
     }
 
     function atualizarRelogioHTML() {
       document.getElementById('relogioTeste').innerHTML = `<i class="fas fa-stopwatch"></i> ${tempoRestante > 0 ? tempoRestante + 's' : '0s'}`;
-      document.getElementById('btnAvancar').innerHTML = `Aguarde... <span class="badge bg-white text-secondary ms-2">${tempoRestante}s</span>`;
+      document.getElementById('btnAvancar').innerHTML = `Aguarde... <span class="badge bg-white text-secondary ms-2">${tempoRestante > 0 ? tempoRestante + 's' : '0s'}</span>`;
     }
 
     function tickTempo() {
@@ -491,12 +462,12 @@
       atualizarRelogioHTML();
       if(tempoRestante <= 0) { 
           clearInterval(timerIntervalo); 
-          verificarPreenchimento(); 
+          verificarPreenchimento(); // Destrava o botão quando o tempo acaba
       }
     }
 
     function verificarPreenchimento() {
-      if(tempoRestante > 0) return; 
+      if(tempoRestante > 0) return; // Se ainda tem tempo, não faz nada
       
       let respondeu = false;
       const radios = document.querySelectorAll('#areaQuestaoAtiva input[type="radio"]:checked');
@@ -510,7 +481,7 @@
       }
 
       const btn = document.getElementById('btnAvancar');
-      if(respondeu) {
+      if(respondeu || (radios.length === 0 && inputs.length === 0)) { // Garante liberação mesmo que a questão não tenha input detectado
         btn.disabled = false;
         btn.style.backgroundColor = "var(--sucesso)";
         btn.style.color = "white";
@@ -522,7 +493,6 @@
       }
     }
 
-    // CAPTURA RESPOSTA ATUAL (Útil tanto para Avançar quanto para Salvar e Sair)
     function capturarRespostaAtual() {
       const q = cadernoAtivo.questoesOriginal[indiceAtual];
       if(["multipla_escolha", "certo_errado", "assercao_razao"].includes(q.tipo)) {
@@ -543,9 +513,6 @@
       renderizarQuestao();
     }
 
-    // -------------------------------------------------------------------------
-    // NOVA FUNÇÃO: SALVAR E SAIR (Pausa o teste)
-    // -------------------------------------------------------------------------
     function pausarEGuardar() {
       Swal.fire({
           title: 'Salvar e Sair?',
@@ -559,7 +526,7 @@
       }).then((result) => {
           if(result.isConfirmed) {
               clearInterval(timerIntervalo);
-              capturarRespostaAtual(); // Salva o que ele digitou até agora
+              capturarRespostaAtual(); 
               
               Swal.fire({ title: 'Salvando no servidor...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
@@ -570,11 +537,8 @@
                   tempoRestante: tempoRestante
               };
 
-              fetch(URL_API_GOOGLE, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                  body: JSON.stringify(pacoteEnvio)
-              }).then(res => res.json()).then(resp => {
+              fetch(URL_API_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(pacoteEnvio) })
+              .then(res => res.json()).then(resp => {
                   Swal.fire('Salvo!', 'Você já pode sair. Suas respostas estão seguras.', 'success').then(() => {
                       alternarTela('telaDashboard');
                       carregarAtividadesPendentes();
@@ -584,16 +548,13 @@
       });
     }
 
-    // ENVIAR PROVA FINALIZADA
     function finalizarEEnviarProva() {
       Swal.fire({ title: 'Finalizando...', text: 'Corrigindo a prova e enviando ao professor.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
       let somaAcertos = 0; let totalQuestoes = cadernoAtivo.questoesOriginal.length; let notaPontos = 0;
 
       cadernoAtivo.questoesOriginal.forEach((q, i) => {
-        let respAluno = respostasAluno[i] || "";
-        let ptsQuestao = parseFloat(q.pontos) || 0;
-        let acertoFracao = 0;
+        let respAluno = respostasAluno[i] || ""; let ptsQuestao = parseFloat(q.pontos) || 0; let acertoFracao = 0;
 
         if(["dissertativa", "estudo_caso", "resposta_curta"].includes(q.tipo)) {
           let gruposChaves = (q.criterios || q.resposta || "").split(/[,;]+/).map(g => g.trim().toLowerCase()).filter(g => g.length > 0);
@@ -603,10 +564,7 @@
           if (pctItem >= 0.8) acertoFracao = 1; else if (pctItem >= 0.5) acertoFracao = 0.75; else if (pctItem >= 0.25) acertoFracao = 0.40;
         } else {
           let respEsp = q.resposta || "";
-          if(q.tipo === 'assercao_razao') {
-             let mapR = {"A":"I", "B":"II", "C":"III", "D":"IV", "E":"V"};
-             if(mapR[respEsp]) respEsp = mapR[respEsp];
-          }
+          if(q.tipo === 'assercao_razao') { let mapR = {"A":"I", "B":"II", "C":"III", "D":"IV", "E":"V"}; if(mapR[respEsp]) respEsp = mapR[respEsp]; }
           if(respAluno.replace(/\s/g, '').toLowerCase() === respEsp.replace(/\s/g, '').toLowerCase()) acertoFracao = 1;
         }
         somaAcertos += acertoFracao; notaPontos += (acertoFracao * ptsQuestao);
@@ -615,23 +573,14 @@
       let pctFinal = totalQuestoes > 0 ? Math.round((somaAcertos / totalQuestoes) * 100) : 0;
       let notaString = pctFinal + "% (" + notaPontos + " pts)";
 
-      let pacoteEnvio = {
-          api: 'finalizarAtividade',
-          linhaPlanilha: cadernoAtivo.linhaPlanilha,
-          respostas: respostasAluno,
-          notaFinal: notaString,
-          tempoRestante: 0 
-      };
+      let pacoteEnvio = { api: 'finalizarAtividade', linhaPlanilha: cadernoAtivo.linhaPlanilha, respostas: respostasAluno, notaFinal: notaString, tempoRestante: 0 };
 
       fetch(URL_API_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(pacoteEnvio) })
-      .then(res => res.json())
-      .then(resp => {
+      .then(res => res.json()).then(resp => {
          if (resp.sucesso) {
              Swal.fire({ title: 'Parabéns!', text: 'Sua atividade foi concluída!', icon: 'success', confirmButtonText: 'Voltar ao Painel', confirmButtonColor: 'var(--primaria)'})
              .then(() => { alternarTela('telaDashboard'); carregarAtividadesPendentes(); });
-         } else {
-             Swal.fire('Ops', resp.erro || 'Erro ao processar', 'error');
-         }
+         } else { Swal.fire('Ops', resp.erro || 'Erro ao processar', 'error'); }
       });
     }
   </script>
