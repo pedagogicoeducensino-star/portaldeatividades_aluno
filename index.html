@@ -12,115 +12,163 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <style>
+    /* PALETA OFICIAL MODERNA (Mais limpa, com sombras suaves) */
     :root { 
       --primaria: #F97316; 
       --primaria-hover: #EA580C;
       --secundaria: #F59E0B; 
       --marrom-suave: #78350F;
-      --marrom-claro: #D97706;
-      --cinza-fundo: #F8FAFC;
+      --cinza-fundo: #F1F5F9;
       --cinza-card: #FFFFFF;
       --cinza-texto: #334155;
       --cinza-borda: #E2E8F0;
-      --sucesso: #10B981; 
-      --fonte-padrao: 16px;
+      --sucesso: #10B981;
+      --perigo: #EF4444;
+      --fonte-padrao: 17px;
     }
     
     body { background-color: var(--cinza-fundo); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--cinza-texto); font-size: var(--fonte-padrao); line-height: 1.6; }
     
-    .card-3d { background: var(--cinza-card); border-radius: 16px; padding: 28px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03); border: 1px solid var(--cinza-borda); border-top: 5px solid var(--primaria); margin-bottom: 24px; }
+    .card-3d { background: var(--cinza-card); border-radius: 20px; padding: 32px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04); border: 1px solid var(--cinza-borda); margin-bottom: 24px; transition: all 0.3s ease;}
+    .card-topo-laranja { border-top: 6px solid var(--primaria); }
+    .card-topo-amarelo { border-top: 6px solid var(--secundaria); }
     
-    .btn-primario { background-color: var(--primaria); color: white; border: none; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.2); font-weight: 600; padding: 12px 20px; border-radius: 8px; transition: all 0.2s;}
-    .btn-primario:hover { background-color: var(--primaria-hover); color: white; transform: translateY(-2px); }
+    .btn-primario { background-color: var(--primaria); color: white; border: none; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.25); font-weight: 700; padding: 14px 24px; border-radius: 12px; transition: all 0.2s;}
+    .btn-primario:hover { background-color: var(--primaria-hover); color: white; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);}
     
     .escondido { display: none !important; }
     
-    .relogio-teste { font-size: 26px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 12px 40px; border-radius: 50px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.1); letter-spacing: 1px;}
-    .progress { background-color: #F1F5F9; border: 1px solid var(--cinza-borda); }
-    .progress-bar { background: linear-gradient(90deg, var(--secundaria), var(--primaria)); transition: width 0.5s ease; }
+    /* Cronômetro e Área de Prova */
+    .relogio-teste { font-size: 28px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 12px 45px; border-radius: 50px; display: inline-block; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 2px;}
+    .progress { background-color: #E2E8F0; border: none; height: 20px; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+    .progress-bar { background: linear-gradient(90deg, var(--secundaria), var(--primaria)); transition: width 0.5s ease; border-radius: 10px; }
     
-    .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--marrom-suave); transition: all 0.2s; border-radius: 8px;}
-    .input-box-destaque:focus { outline: none; border-color: var(--primaria); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15); background-color: white;}
+    .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--marrom-suave); transition: all 0.2s; border-radius: 10px;}
+    .input-box-destaque:focus { outline: none; border-color: var(--primaria); box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15); background-color: white;}
     
-    .estudo-caso-box { background-color: #FFFBEB; border-left: 4px solid var(--secundaria); padding: 18px; border-radius: 8px; margin-bottom: 18px; font-style: italic; color: var(--marrom-suave); }
+    .box-info { background-color: #FFFBEB; border-left: 5px solid var(--secundaria); padding: 20px; border-radius: 12px; color: var(--marrom-suave); font-size: 16px; margin-bottom: 24px;}
+    
+    /* Prevenção de Seleção de Texto (Anti-cola visual) */
+    .noselect { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
   </style>
 </head>
 <body>
 
   <!-- TELA DE LOGIN DO ALUNO -->
-  <div id="telaLogin" class="card-3d mx-auto shadow-sm" style="max-width: 400px; margin-top: 15vh;">
+  <div id="telaLogin" class="card-3d card-topo-laranja mx-auto shadow" style="max-width: 450px; margin-top: 12vh;">
     <div class="text-center mb-4">
-      <div class="mb-3"><i class="fas fa-user-graduate" style="font-size: 50px; color: var(--primaria);"></i></div>
+      <div class="mb-3"><i class="fas fa-user-astronaut" style="font-size: 55px; color: var(--primaria);"></i></div>
       <h2 class="fw-bold mb-1" style="color: var(--marrom-suave);">Portal do Aluno</h2>
-      <p class="text-muted small">Acesse suas atividades</p>
+      <p class="text-muted">Conecte-se para acessar suas missões</p>
     </div>
     <div class="mb-4">
-      <label class="form-label fw-bold text-secondary">Nº da Matrícula:</label>
-      <div class="input-group">
+      <label class="form-label fw-bold" style="color: var(--cinza-texto);">Nº da Matrícula:</label>
+      <div class="input-group input-group-lg">
         <span class="input-group-text bg-light border-end-0"><i class="fas fa-id-card text-muted"></i></span>
-        <input type="text" id="inputMatricula" class="form-control border-start-0" placeholder="Digite sua matrícula..." onkeypress="if(event.key === 'Enter') fazerLoginAluno()">
+        <input type="text" id="inputMatricula" class="form-control border-start-0 fs-5" placeholder="Digite sua matrícula..." onkeypress="if(event.key === 'Enter') fazerLoginAluno()">
       </div>
     </div>
-    <button class="btn btn-primario w-100 fs-5" onclick="fazerLoginAluno()" id="btnLogin">Entrar <i class="fas fa-arrow-right"></i></button>
+    <button class="btn btn-primario w-100 fs-5" onclick="fazerLoginAluno()" id="btnLogin">Acessar Portal <i class="fas fa-rocket ms-2"></i></button>
   </div>
 
   <!-- TELA DASHBOARD (ATIVIDADES) -->
-  <div id="telaDashboard" class="container py-4 escondido" style="max-width: 950px;">
+  <div id="telaDashboard" class="container py-4 escondido" style="max-width: 1000px;">
     
-    <!-- Cabeçalho e Saudação -->
-    <div class="d-flex justify-content-between align-items-center mb-4 card-3d py-4 shadow-sm" style="border-top-color: var(--secundaria); background: linear-gradient(to right, #ffffff, #FFFBEB);">
-      <div class="d-flex align-items-center gap-3">
-        <div class="bg-white shadow-sm p-3 rounded-circle text-center border" style="width: 60px; height: 60px; line-height: 25px;">
-            <i class="fas fa-user-graduate fs-4" style="color: var(--primaria);"></i>
+    <!-- Cabeçalho Dinâmico -->
+    <div class="d-flex justify-content-between align-items-center mb-4 card-3d card-topo-amarelo py-4" style="background: linear-gradient(to right, #ffffff, #FFFBEB);">
+      <div class="d-flex align-items-center gap-4">
+        <div class="bg-white shadow-sm p-3 rounded-circle text-center border" style="width: 70px; height: 70px; line-height: 35px;">
+            <i class="fas fa-gamepad fs-3" style="color: var(--primaria);"></i>
         </div>
         <div>
-          <h3 class="mb-1 fw-bold text-dark" id="textoSaudacao">Olá!</h3>
-          <span class="text-muted small">Seja bem-vindo(a) ao seu painel de estudos.</span>
+          <h2 class="mb-1 fw-bold text-dark" id="textoSaudacao">Olá!</h2>
+          <span class="text-muted">Pronto para dar continuidade aos seus estudos hoje?</span>
         </div>
       </div>
-      <button class="btn btn-sm btn-outline-danger fw-bold shadow-sm" onclick="sair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+      <button class="btn btn-outline-danger fw-bold shadow-sm rounded-pill px-4" onclick="sair()"><i class="fas fa-power-off me-2"></i> Sair</button>
     </div>
 
     <!-- SESSÃO 1: EM ANDAMENTO -->
     <div class="card-3d mb-4" style="border-top: none;" id="sessaoEmAndamento">
-      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-play-circle me-2" style="color: var(--secundaria);"></i> Continue de onde parou</h5>
-      <div id="listaEmAndamento" class="row g-3"></div>
+      <h4 class="mb-4 fw-bold" style="color: var(--marrom-suave);"><i class="fas fa-play-circle me-2" style="color: var(--secundaria);"></i> Continue de onde parou</h4>
+      <div id="listaEmAndamento" class="row g-4"></div>
     </div>
 
     <!-- SESSÃO 2: PENDENTES (A FAZER) -->
     <div class="card-3d mb-4" style="border-top: none;" id="sessaoPendentes">
-      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-tasks me-2" style="color: var(--primaria);"></i> Avaliações Pendentes</h5>
-      <div id="listaPendentes" class="row g-3"></div>
+      <h4 class="mb-4 fw-bold" style="color: var(--marrom-suave);"><i class="fas fa-clipboard-list me-2" style="color: var(--primaria);"></i> Novas Atividades Pendentes</h4>
+      <div id="listaPendentes" class="row g-4"></div>
     </div>
 
     <!-- SESSÃO 3: CONCLUÍDAS (BOLETIM) -->
     <div class="card-3d" style="border-top: none; background-color: #F8FAFC;" id="sessaoConcluidas">
-      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-check-circle me-2" style="color: var(--sucesso);"></i> Meu Boletim (Concluídas)</h5>
-      <div id="listaConcluidas" class="row g-3"></div>
+      <h4 class="mb-4 fw-bold text-dark"><i class="fas fa-award me-2" style="color: var(--sucesso);"></i> Meu Boletim Escolar</h4>
+      <div id="listaConcluidas" class="row g-4"></div>
     </div>
-    
   </div>
 
-  <!-- TELA DE EXECUÇÃO DA PROVA -->
-  <div id="telaExecucaoProva" class="container py-4 escondido" style="max-width: 750px;">
+  <!-- TELA DE INSTRUÇÕES (PRÉ-PROVA) -->
+  <div id="telaInstrucoes" class="container py-5 escondido" style="max-width: 850px;">
+    <div class="card-3d card-topo-laranja text-center p-5">
+       <i class="fas fa-bullhorn mb-3" style="font-size: 60px; color: var(--secundaria);"></i>
+       <h2 class="fw-bold mb-2 text-dark" id="infoTituloProva">Título da Prova</h2>
+       <p class="text-muted fs-5 mb-5">Leia as instruções atentamente antes de iniciar.</p>
+       
+       <div class="row text-start mb-5 g-4">
+          <div class="col-md-6">
+             <div class="box-info h-100 mb-0">
+                <i class="fas fa-ban text-danger fs-4 mb-2"></i><br>
+                <strong>Sistema Anti-Cola:</strong> A cópia de textos de fora é bloqueada. O sistema detecta se você trocar de aba e o <u>tempo da questão será zerado</u>.
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="box-info h-100 mb-0">
+                <i class="fas fa-save text-success fs-4 mb-2"></i><br>
+                <strong>Salvar e Sair:</strong> Se a aula acabar ou houver imprevisto, clique em "Salvar e Sair" no topo da prova. Seu progresso ficará guardado.
+             </div>
+          </div>
+       </div>
+       
+       <h5 class="mb-4">Total de Questões: <strong id="infoQtdQuestoes" style="color: var(--primaria);">0</strong></h5>
+       
+       <div class="d-flex justify-content-center gap-3">
+          <button class="btn btn-secondary btn-lg rounded-pill px-4" onclick="alternarTela('telaDashboard')"><i class="fas fa-arrow-left me-2"></i> Voltar</button>
+          <button class="btn btn-primario btn-lg rounded-pill px-5" onclick="prepararExecucao()"><i class="fas fa-flag-checkered me-2"></i> Estou Ciente, Começar!</button>
+       </div>
+    </div>
+  </div>
+
+  <!-- TELA DE EXECUÇÃO DA PROVA (AMBIENTE CONTROLADO E SEGURO) -->
+  <div id="telaExecucaoProva" class="container py-4 escondido noselect" style="max-width: 950px;">
+    
+    <!-- Cabeçalho da Prova (Com botão Salvar e Sair) -->
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-pill shadow-sm border">
+        <div class="ms-3 fw-bold text-dark fs-5"><i class="fas fa-book-open me-2" style="color: var(--primaria);"></i> <span id="tituloProvaExecucao">Atividade</span></div>
+        <button class="btn btn-outline-danger fw-bold rounded-pill" onclick="pausarEGuardar()">
+            <i class="fas fa-save me-1"></i> Salvar e Sair
+        </button>
+    </div>
+
+    <!-- Cronômetro e Progresso -->
     <div class="mb-4 text-center">
       <div class="relogio-teste mx-auto mb-4" id="relogioTeste"><i class="fas fa-stopwatch"></i> 0s</div>
       
       <div class="d-flex justify-content-between align-items-end mb-2 px-2">
-        <span class="fw-bold text-secondary fs-5" id="textoProgresso">Questão 1 de X</span>
-        <span class="fw-bold" style="color: var(--primaria);" id="percentualProgresso">0%</span>
+        <span class="fw-bold fs-5 text-secondary" id="textoProgresso">Questão 1 de X</span>
+        <span class="fw-bold fs-5" style="color: var(--primaria);" id="percentualProgresso">0%</span>
       </div>
-      <div class="progress shadow-sm" style="height: 18px; border-radius: 10px;">
+      <div class="progress shadow-sm mb-4">
         <div id="barraProgresso" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
       </div>
     </div>
 
-    <div id="areaQuestaoAtiva" class="card-3d shadow-sm mb-4" style="border-top-width: 6px; border-top-color: var(--secundaria); min-height: 250px;">
-      <!-- Questão será renderizada aqui -->
+    <!-- Área da Questão -->
+    <div id="areaQuestaoAtiva" class="card-3d shadow mb-4" style="border-top-width: 6px; border-top-color: var(--secundaria); min-height: 300px;">
+      <!-- HTML da Questão Injetado Aqui -->
     </div>
 
     <div class="text-center mt-4 pb-5">
-      <button id="btnAvancar" class="btn btn-secondary w-100 shadow-sm fw-bold mb-3" disabled onclick="avancarQuestao()" style="padding: 16px; font-size: 18px; border-radius: 12px;">
+      <button id="btnAvancar" class="btn btn-secondary w-100 shadow fw-bold mb-3" disabled onclick="avancarQuestao()" style="padding: 18px; font-size: 20px; border-radius: 15px;">
         Aguarde o tempo...
       </button>
     </div>
@@ -128,7 +176,7 @@
 
   <script>
     // =========================================================================
-    // COLE AQUI A SUA URL DO GOOGLE APPS SCRIPT (A MESMA DO PROFESSOR)
+    // COLE AQUI A SUA URL DO GOOGLE APPS SCRIPT
     // =========================================================================
     const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzEjn_R54vUXpglydH_z669p53Smxw84wt7gm9KPdQSlp5rMHovbxb7-pq7MSWv6Mfd/exec";
     
@@ -140,7 +188,39 @@
     let tempoRestante = 0;
     let timerIntervalo = null;
 
-    // VERIFICA SE O ALUNO JÁ ESTÁ LOGADO AO ABRIR A PÁGINA (Anti-Refresh)
+    // BLOQUEIOS ANTI-COLA E MUDANÇA DE ABA
+    
+    // 1. Bloqueia Copiar e Colar dentro da execução
+    document.addEventListener('copy', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
+    document.addEventListener('cut', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
+    document.addEventListener('paste', function(e) { 
+        if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) {
+            e.preventDefault();
+            Swal.fire('Bloqueado!', 'A função de colar texto não é permitida nesta atividade.', 'error');
+        } 
+    });
+
+    // 2. Alerta Vermelho de Troca de Aba (Foco)
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && !document.getElementById('telaExecucaoProva').classList.contains('escondido')) {
+             // Punição: Volta o tempo da questão pro início
+             const q = cadernoAtivo.questoesOriginal[indiceAtual];
+             tempoRestante = parseInt(q.tempo || 60);
+             atualizarRelogioHTML();
+             
+             Swal.fire({
+                title: '⚠️ ALERTA DE FOCO!',
+                html: 'Você saiu da aba da atividade.<br><br>Como regra de segurança, <b>o tempo desta questão foi reiniciado</b>. Mantenha o foco até concluir!',
+                icon: 'error',
+                allowOutsideClick: false,
+                confirmButtonColor: 'var(--perigo)',
+                confirmButtonText: 'Entendi, vou focar'
+             });
+        }
+    });
+
+
+    // INICIALIZAÇÃO
     window.onload = function() {
       const sessaoSalva = localStorage.getItem('alunoLogado_LMS');
       if (sessaoSalva) {
@@ -158,64 +238,57 @@
 
     function sair() {
       dadosAluno = null;
-      localStorage.removeItem('alunoLogado_LMS'); // Limpa a memória
+      localStorage.removeItem('alunoLogado_LMS');
       document.getElementById('inputMatricula').value = "";
       alternarTela('telaLogin');
     }
 
-    // SAUDAÇÃO INTELIGENTE POR HORA DO DIA
     function montarSaudacao(nome) {
       const hora = new Date().getHours();
       let cumprimento = "Boa noite";
       if (hora >= 5 && hora < 12) cumprimento = "Bom dia";
       else if (hora >= 12 && hora < 18) cumprimento = "Boa tarde";
-      
-      document.getElementById('textoSaudacao').innerHTML = `${cumprimento}, <strong style="color: var(--primaria);">${nome}</strong>! 📚`;
+      document.getElementById('textoSaudacao').innerHTML = `${cumprimento}, <strong style="color: var(--primaria);">${nome}</strong>! 🚀`;
     }
 
     // LOGIN
     function fazerLoginAluno() {
       const matricula = document.getElementById('inputMatricula').value.trim();
-      if(!matricula) { Swal.fire('Atenção', 'Digite sua matrícula para entrar.', 'warning'); return; }
+      if(!matricula) return;
 
       const btn = document.getElementById('btnLogin');
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
       btn.disabled = true;
 
       fetch(`${URL_API_GOOGLE}?api=loginAluno&matricula=${matricula}`)
         .then(res => res.json())
         .then(resp => {
-          btn.innerHTML = 'Entrar <i class="fas fa-arrow-right"></i>';
+          btn.innerHTML = 'Acessar Portal <i class="fas fa-rocket ms-2"></i>';
           btn.disabled = false;
-
           if(resp.sucesso) {
             dadosAluno = { matricula: matricula, nome: resp.nome };
-            localStorage.setItem('alunoLogado_LMS', JSON.stringify(dadosAluno)); // Salva na memória do navegador
-            
+            localStorage.setItem('alunoLogado_LMS', JSON.stringify(dadosAluno));
             montarSaudacao(resp.nome);
             alternarTela('telaDashboard');
             carregarAtividadesPendentes();
           } else {
-            Swal.fire('Acesso Negado', resp.msg || 'Matrícula não encontrada ou bloqueada.', 'error');
+            Swal.fire('Acesso Negado', resp.msg, 'error');
           }
-        })
-        .catch(err => {
-          btn.innerHTML = 'Entrar <i class="fas fa-arrow-right"></i>';
+        }).catch(err => {
+          btn.innerHTML = 'Acessar Portal <i class="fas fa-rocket ms-2"></i>';
           btn.disabled = false;
-          Swal.fire('Erro', 'Falha na conexão com o servidor.', 'error');
+          Swal.fire('Erro', 'Falha na rede.', 'error');
         });
     }
 
-// BUSCAR PAINEL (Agora as seções nunca somem, mostram avisos)
+    // BUSCAR PAINEL
     function carregarAtividadesPendentes() {
       const containerEmAndamento = document.getElementById('listaEmAndamento');
       const containerPendentes = document.getElementById('listaPendentes');
       const containerConcluidas = document.getElementById('listaConcluidas');
       
-      containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted"><i class="fas fa-spinner fa-spin mb-2"></i> Buscando...</div>';
-      containerPendentes.innerHTML = '';
-      containerConcluidas.innerHTML = '';
-
+      containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted"><i class="fas fa-spinner fa-spin fs-2"></i></div>';
+      
       fetch(`${URL_API_GOOGLE}?api=painelAluno&matricula=${dadosAluno.matricula}`)
         .then(res => res.json())
         .then(painel => {
@@ -226,41 +299,31 @@
           containerConcluidas.innerHTML = '';
 
           // 1. EM ANDAMENTO
-          document.getElementById('sessaoEmAndamento').classList.remove('escondido'); // Garante que fica visível
+          document.getElementById('sessaoEmAndamento').classList.remove('escondido');
           if(painel.em_andamento && painel.em_andamento.length > 0) {
-            painel.em_andamento.forEach(ativ => {
-              containerEmAndamento.innerHTML += gerarCardHTML(ativ, 'andamento');
-            });
+            painel.em_andamento.forEach(ativ => containerEmAndamento.innerHTML += gerarCardHTML(ativ, 'andamento'));
           } else {
-            // Mensagem de vazio (Empty State)
-            containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-light rounded"><i class="fas fa-pause-circle fs-3 mb-2" style="color: #CBD5E1;"></i><br>Nenhuma avaliação pausada no momento.</div>';
+            containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-pause-circle fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pausada.</div>';
           }
 
           // 2. PENDENTES (A FAZER)
-          document.getElementById('sessaoPendentes').classList.remove('escondido'); // Garante que fica visível
+          document.getElementById('sessaoPendentes').classList.remove('escondido');
           if(painel.a_fazer && painel.a_fazer.length > 0) {
-             painel.a_fazer.forEach(ativ => {
-               containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer');
-             });
+             painel.a_fazer.forEach(ativ => containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer'));
           } else {
-             // Mensagem de vazio (Empty State)
-             containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-light rounded"><i class="fas fa-mug-hot fs-3 mb-2" style="color: #CBD5E1;"></i><br>Nenhuma avaliação pendente. Tudo em dia!</div>';
+             containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pendente. Tudo em dia!</div>';
           }
 
           // 3. CONCLUÍDAS (BOLETIM)
-          document.getElementById('sessaoConcluidas').classList.remove('escondido'); // Garante que fica visível
+          document.getElementById('sessaoConcluidas').classList.remove('escondido');
           if(painel.concluidas && painel.concluidas.length > 0) {
-             painel.concluidas.forEach(ativ => {
-               containerConcluidas.innerHTML += gerarCardHTML(ativ, 'concluida');
-             });
+             painel.concluidas.forEach(ativ => containerConcluidas.innerHTML += gerarCardHTML(ativ, 'concluida'));
           } else {
-             // Mensagem de vazio (Empty State)
-             containerConcluidas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-light rounded"><i class="fas fa-medal fs-3 mb-2" style="color: #CBD5E1;"></i><br>Seu boletim está vazio. Finalize uma atividade para ver sua nota aqui.</div>';
+             containerConcluidas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-medal fs-3 mb-2 opacity-50"></i><br>Boletim vazio. Finalize uma atividade primeiro.</div>';
           }
         });
     }
-    
-    // Função auxiliar para desenhar o HTML dos Cards
+
     function gerarCardHTML(ativ, tipo) {
       let qtdQ = ativ.questoesOriginal ? ativ.questoesOriginal.length : 0;
       let prazoTxt = ativ.prazo ? ativ.prazo : 'Sem prazo';
@@ -268,84 +331,77 @@
       if(tipo === 'andamento') {
          return `
           <div class="col-md-6">
-            <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 4px solid var(--secundaria);">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="fw-bold text-dark mb-0">${ativ.titulo}</h5>
+            <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--secundaria);">
+              <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
+              <div class="mb-4 small text-muted">
+                <i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
               </div>
-              <div class="mb-4 small text-muted mt-2">
-                <i class="far fa-clock"></i> Prazo: ${prazoTxt} <br>
-                <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
-              </div>
-              <button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave);" onclick="iniciarProva(${ativ.linhaPlanilha})">
+              <button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave);" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
                  <i class="fas fa-play me-2"></i> Continuar Prova
               </button>
             </div>
           </div>`;
-      } 
-      else if(tipo === 'fazer') {
+      } else if(tipo === 'fazer') {
          return `
           <div class="col-md-6">
-            <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 4px solid var(--primaria);">
-              <h5 class="fw-bold text-dark mb-2">${ativ.titulo}</h5>
+            <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--primaria);">
+              <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
               <div class="mb-4 small text-muted">
-                <i class="far fa-clock"></i> Prazo: ${prazoTxt} <br>
-                <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
+                <i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
               </div>
-              <button class="btn btn-primario w-100 fw-bold mt-auto" onclick="iniciarProva(${ativ.linhaPlanilha})">
+              <button class="btn btn-primario w-100 fw-bold mt-auto" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
                  <i class="fas fa-pen me-2"></i> Iniciar Agora
               </button>
             </div>
           </div>`;
-      } 
-      else if(tipo === 'concluida') {
+      } else if(tipo === 'concluida') {
          return `
           <div class="col-md-6">
-            <div class="p-4 bg-white border rounded shadow-sm h-100" style="border-left: 4px solid var(--sucesso); opacity: 0.9;">
-              <h5 class="fw-bold text-dark mb-2">${ativ.titulo}</h5>
-              <div class="mb-3 small text-muted">
-                <i class="fas fa-calendar-check"></i> Finalizada <br>
-                <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
-              </div>
-              <div class="p-2 text-center rounded fw-bold fs-5 mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">
-                 Nota: ${ativ.nota || 'Aguardando'}
+            <div class="p-4 bg-white border rounded shadow-sm h-100" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
+              <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
+              <div class="p-3 text-center rounded fw-bold fs-5 mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">
+                 Nota Recebida: ${ativ.nota || 'Aguardando'}
               </div>
             </div>
           </div>`;
       }
     }
 
-    // INICIAR A PROVA
-    function iniciarProva(linhaPlanilha) {
+    // TELA DE INSTRUÇÕES
+    function abrirInstrucoes(linhaPlanilha) {
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
       cadernoAtivo = pendentes.find(p => p.linhaPlanilha === linhaPlanilha);
       
       if(!cadernoAtivo || !cadernoAtivo.questoesOriginal || cadernoAtivo.questoesOriginal.length === 0) {
-          Swal.fire('Atenção', 'As questões desta prova não estão disponíveis.', 'warning');
-          return;
+          Swal.fire('Atenção', 'Questões indisponíveis.', 'warning'); return;
       }
 
-      Swal.fire({
-        title: 'Pronto para começar?',
-        text: "O tempo de cada questão não pode ser pausado após o início.",
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonColor: 'var(--primaria)',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sim, Começar!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-            if(cadernoAtivo.embaralhar) {
-                cadernoAtivo.questoesOriginal = cadernoAtivo.questoesOriginal.sort(() => Math.random() - 0.5);
-            }
-            respostasAluno = new Array(cadernoAtivo.questoesOriginal.length).fill(null);
-            indiceAtual = 0;
-            alternarTela('telaExecucaoProva');
-            renderizarQuestao();
-        }
-      });
+      document.getElementById('infoTituloProva').innerText = cadernoAtivo.titulo;
+      document.getElementById('infoQtdQuestoes').innerText = cadernoAtivo.questoesOriginal.length;
+      document.getElementById('tituloProvaExecucao').innerText = cadernoAtivo.titulo;
+      
+      alternarTela('telaInstrucoes');
     }
 
-    // RENDERIZAR A QUESTÃO NA TELA
+    // INICIAR DE FATO
+    function prepararExecucao() {
+      // Se tiver rascunho salvo (em andamento), recupera. Se não, cria array vazio.
+      if (cadernoAtivo.respostasSalvas && cadernoAtivo.respostasSalvas.length === cadernoAtivo.questoesOriginal.length) {
+          respostasAluno = cadernoAtivo.respostasSalvas;
+      } else {
+          if(cadernoAtivo.embaralhar) cadernoAtivo.questoesOriginal = cadernoAtivo.questoesOriginal.sort(() => Math.random() - 0.5);
+          respostasAluno = new Array(cadernoAtivo.questoesOriginal.length).fill(null);
+      }
+      
+      // Acha a primeira questão que ele ainda não respondeu para pular direto pra ela
+      indiceAtual = respostasAluno.findIndex(r => r === null || r === "");
+      if(indiceAtual === -1) indiceAtual = 0; // Se tudo estiver preenchido (bug), volta pra 0
+
+      alternarTela('telaExecucaoProva');
+      renderizarQuestao();
+    }
+
+    // RENDERIZAR QUESTÃO
     function renderizarQuestao() {
       if(indiceAtual >= cadernoAtivo.questoesOriginal.length) { 
           finalizarEEnviarProva(); 
@@ -377,62 +433,63 @@
       if(q.tipo === "estudo_caso") html += '<div class="estudo-caso-box shadow-sm">' + (q.contexto || "").replace(/\n/g, '<br>') + '</div>';
       
       if(q.tipo === "lacunas") {
-        let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:40px;" oninput="verificarPreenchimento()">');
+        let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:45px;" oninput="verificarPreenchimento()">');
         html += '<p class="fw-bold mb-4 text-dark fs-5">' + enunciadoFmt + '</p>';
       } else if(q.tipo !== "assercao_razao") {
-        html += '<p class="fw-bold mb-4 text-dark fs-5">' + (q.enunciado || "") + '</p>';
+        html += '<p class="fw-bold mb-4 text-dark fs-4" style="line-height: 1.5;">' + (q.enunciado || "") + '</p>';
       }
 
       if (q.tipo === "multipla_escolha") {
         ['A','B','C','D','E'].forEach(l => { 
             if(q.opcoes && q.opcoes[l]) {
-                html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100 fs-6" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; 
+                html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3 mt-1" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100 fs-5" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; 
             }
         });
       } else if (q.tipo === "certo_errado") {
-        html += `<div class="d-flex gap-4 mb-3"><div class="form-check p-3 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Certo" id="opt_C" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-success w-100" for="opt_C" style="cursor:pointer;">CERTO</label></div><div class="form-check p-3 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Errado" id="opt_E" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-danger w-100" for="opt_E" style="cursor:pointer;">ERRADO</label></div></div>`;
+        html += `<div class="d-flex gap-4 mb-3"><div class="form-check p-4 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Certo" id="opt_C" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-success w-100 fs-4" for="opt_C" style="cursor:pointer;">CERTO</label></div><div class="form-check p-4 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Errado" id="opt_E" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-danger w-100 fs-4" for="opt_E" style="cursor:pointer;">ERRADO</label></div></div>`;
       } else if (q.tipo === "assercao_razao") {
-        html += `<div class="bg-light p-4 rounded mb-4 border shadow-sm"><p class="mb-2 fw-bold">I. ${q.assercao}</p><div class="text-danger fw-bold my-3 text-center"><i class="fas fa-link"></i> PORQUE</div><p class="mb-0 fw-bold">II. ${q.razao}</p></div>`;
+        html += `<div class="bg-light p-4 rounded mb-4 border shadow-sm"><p class="mb-2 fw-bold fs-5">I. ${q.assercao}</p><div class="text-danger fw-bold my-3 text-center"><i class="fas fa-link"></i> PORQUE</div><p class="mb-0 fw-bold fs-5">II. ${q.razao}</p></div>`;
         let assOpcoes = [ {v: "I", t: "I. A afirmação I é verdadeira, e a II é verdadeira, e a II justifica a I."}, {v: "II", t: "II. A afirmação I é verdadeira, e a II é verdadeira, mas a II não justifica a I."}, {v: "III", t: "III. A afirmação I é verdadeira, e a II é falsa."}, {v: "IV", t: "IV. A afirmação I é falsa, e a II é verdadeira."}, {v: "V", t: "V. A afirmação I é falsa, e a II é falsa."} ];
         assOpcoes.forEach(op => {
-            html += `<div class="form-check mb-2 p-2 rounded bg-light border"><input class="form-check-input ms-1 me-2" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`;
+            html += `<div class="form-check mb-3 p-3 rounded bg-light border"><input class="form-check-input ms-1 me-3 mt-1" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label fs-6" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`;
         });
       } else if (q.tipo === "associacao") {
         html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`;
-        (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-2 bg-light rounded border shadow-sm"><strong>${idx+1}.</strong> ${item}</div>`; });
+        (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm fs-5"><strong>${idx+1}.</strong> ${item}</div>`; });
         html += `</div><div class="col-sm-7 ps-4">`;
         (q.colunaB || []).forEach((item, idx) => { 
-          let dItem = (q.b_is_img && item.startsWith('http')) ? `<img src="${item}" class="rounded border" style="max-height:60px;">` : `<span class="fw-bold">${item}</span>`;
-          html += `<div class="d-flex align-items-center mb-3 bg-white p-2 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:45px; height:45px; font-size:18px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
+          let dItem = (q.b_is_img && item.startsWith('http')) ? `<img src="${item}" class="rounded border" style="max-height:60px;">` : `<span class="fw-bold fs-5">${item}</span>`;
+          html += `<div class="d-flex align-items-center mb-3 bg-white p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:50px; height:50px; font-size:20px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
         });
         html += `</div></div>`;
       } else if (q.tipo === "ordenacao") {
-        q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:55px; height:45px; font-size:18px;" oninput="verificarPreenchimento()"></div></div>`; });
+        q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark fs-5">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:60px; height:50px; font-size:20px;" oninput="verificarPreenchimento()"></div></div>`; });
       } else if (q.tipo === "verdadeiro_falso_mult") {
-        q.lista.forEach(item => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-4 p-0 text-uppercase" style="width:50px; height:45px; font-weight:800;" maxlength="1" oninput="verificarPreenchimento()"><span class="fw-bold text-dark">${item}</span></div>`; });
+        q.lista.forEach(item => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-4 p-0 text-uppercase" style="width:55px; height:50px; font-weight:800; font-size:20px;" maxlength="1" oninput="verificarPreenchimento()"><span class="fw-bold text-dark fs-5">${item}</span></div>`; });
       } else if (q.tipo !== "lacunas") {
-        html += `<textarea class="form-control in-teste p-3 shadow-sm" style="border: 2px solid var(--primaria); font-weight: 600; background-color: #FFFBEB;" rows="5" placeholder="Digite sua resposta detalhada aqui..." oninput="verificarPreenchimento()"></textarea>`;
+        html += `<textarea class="form-control in-teste p-4 shadow-sm fs-5" style="border: 2px solid var(--primaria); font-weight: 600; background-color: #FFFBEB; border-radius: 12px;" rows="6" placeholder="Digite sua resposta com as próprias palavras aqui..." oninput="verificarPreenchimento()"></textarea>`;
       }
       
       document.getElementById('areaQuestaoAtiva').innerHTML = html + '</div>';
       
       const btn = document.getElementById('btnAvancar');
       btn.disabled = true;
-      btn.className = "btn btn-secondary w-100 mb-3 shadow-sm";
-      btn.innerHTML = `Aguarde... <span class="badge bg-white text-secondary ms-2">${tempoRestante}s</span>`;
+      btn.className = "btn btn-secondary w-100 mb-3 shadow fw-bold";
+      atualizarRelogioHTML();
       
       clearInterval(timerIntervalo);
-      document.getElementById('relogioTeste').innerHTML = `<i class="fas fa-stopwatch"></i> ${tempoRestante}s`;
       timerIntervalo = setInterval(tickTempo, 1000);
+    }
+
+    function atualizarRelogioHTML() {
+      document.getElementById('relogioTeste').innerHTML = `<i class="fas fa-stopwatch"></i> ${tempoRestante > 0 ? tempoRestante + 's' : '0s'}`;
+      document.getElementById('btnAvancar').innerHTML = `Aguarde... <span class="badge bg-white text-secondary ms-2">${tempoRestante}s</span>`;
     }
 
     function tickTempo() {
       tempoRestante--;
-      document.getElementById('relogioTeste').innerHTML = `<i class="fas fa-stopwatch"></i> ${tempoRestante > 0 ? tempoRestante + 's' : '0s'}`;
-      
-      if(tempoRestante > 0) { 
-          document.getElementById('btnAvancar').innerHTML = `Aguarde... <span class="badge bg-white text-secondary ms-2">${tempoRestante}s</span>`; 
-      } else { 
+      atualizarRelogioHTML();
+      if(tempoRestante <= 0) { 
           clearInterval(timerIntervalo); 
           verificarPreenchimento(); 
       }
@@ -457,7 +514,7 @@
         btn.disabled = false;
         btn.style.backgroundColor = "var(--sucesso)";
         btn.style.color = "white";
-        btn.innerHTML = (indiceAtual === cadernoAtivo.questoesOriginal.length - 1) ? 'Finalizar Prova <i class="fas fa-flag-checkered ms-2"></i>' : 'Confirmar Resposta <i class="fas fa-arrow-right ms-2"></i>';
+        btn.innerHTML = (indiceAtual === cadernoAtivo.questoesOriginal.length - 1) ? 'Finalizar Atividade <i class="fas fa-flag-checkered ms-2"></i>' : 'Confirmar e Avançar <i class="fas fa-arrow-right ms-2"></i>';
       } else {
         btn.disabled = true;
         btn.style.backgroundColor = "#6c757d";
@@ -465,33 +522,73 @@
       }
     }
 
-    function avancarQuestao() {
+    // CAPTURA RESPOSTA ATUAL (Útil tanto para Avançar quanto para Salvar e Sair)
+    function capturarRespostaAtual() {
       const q = cadernoAtivo.questoesOriginal[indiceAtual];
       if(["multipla_escolha", "certo_errado", "assercao_razao"].includes(q.tipo)) {
         const rad = document.querySelector('input[name="respProva"]:checked');
-        respostasAluno[indiceAtual] = rad ? rad.value : "";
+        if(rad) respostasAluno[indiceAtual] = rad.value;
       } else {
         const inputs = document.querySelectorAll('.in-teste');
-        let vals = []; inputs.forEach(i => vals.push(i.value.trim().toUpperCase()));
-        respostasAluno[indiceAtual] = vals.join(", ");
+        if(inputs.length > 0) {
+            let vals = []; inputs.forEach(i => vals.push(i.value.trim().toUpperCase()));
+            respostasAluno[indiceAtual] = vals.join(", ");
+        }
       }
-      
+    }
+
+    function avancarQuestao() {
+      capturarRespostaAtual();
       indiceAtual++; 
       renderizarQuestao();
     }
 
-    // ENVIAR PARA O SEU GS
-    function finalizarEEnviarProva() {
+    // -------------------------------------------------------------------------
+    // NOVA FUNÇÃO: SALVAR E SAIR (Pausa o teste)
+    // -------------------------------------------------------------------------
+    function pausarEGuardar() {
       Swal.fire({
-          title: 'Finalizando...',
-          text: 'Enviando suas respostas e corrigindo a prova.',
-          allowOutsideClick: false,
-          didOpen: () => { Swal.showLoading(); }
-      });
+          title: 'Salvar e Sair?',
+          text: 'Seu progresso será salvo. Você poderá continuar de onde parou na próxima aula.',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: 'var(--primaria)',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Sim, salvar progresso',
+          cancelButtonText: 'Cancelar'
+      }).then((result) => {
+          if(result.isConfirmed) {
+              clearInterval(timerIntervalo);
+              capturarRespostaAtual(); // Salva o que ele digitou até agora
+              
+              Swal.fire({ title: 'Salvando no servidor...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
-      let somaAcertos = 0; 
-      let totalQuestoes = cadernoAtivo.questoesOriginal.length;
-      let notaPontos = 0;
+              let pacoteEnvio = {
+                  api: 'salvarProgresso',
+                  linhaPlanilha: cadernoAtivo.linhaPlanilha,
+                  respostas: respostasAluno,
+                  tempoRestante: tempoRestante
+              };
+
+              fetch(URL_API_GOOGLE, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                  body: JSON.stringify(pacoteEnvio)
+              }).then(res => res.json()).then(resp => {
+                  Swal.fire('Salvo!', 'Você já pode sair. Suas respostas estão seguras.', 'success').then(() => {
+                      alternarTela('telaDashboard');
+                      carregarAtividadesPendentes();
+                  });
+              });
+          }
+      });
+    }
+
+    // ENVIAR PROVA FINALIZADA
+    function finalizarEEnviarProva() {
+      Swal.fire({ title: 'Finalizando...', text: 'Corrigindo a prova e enviando ao professor.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+
+      let somaAcertos = 0; let totalQuestoes = cadernoAtivo.questoesOriginal.length; let notaPontos = 0;
 
       cadernoAtivo.questoesOriginal.forEach((q, i) => {
         let respAluno = respostasAluno[i] || "";
@@ -500,11 +597,8 @@
 
         if(["dissertativa", "estudo_caso", "resposta_curta"].includes(q.tipo)) {
           let gruposChaves = (q.criterios || q.resposta || "").split(/[,;]+/).map(g => g.trim().toLowerCase()).filter(g => g.length > 0);
-          let respAlunoMin = respAluno.toLowerCase();
-          let encontradas = 0;
-          gruposChaves.forEach(grupo => {
-            if(grupo.split('/').some(s => respAlunoMin.includes(s.trim()))) encontradas++;
-          });
+          let respAlunoMin = respAluno.toLowerCase(); let encontradas = 0;
+          gruposChaves.forEach(grupo => { if(grupo.split('/').some(s => respAlunoMin.includes(s.trim()))) encontradas++; });
           let pctItem = gruposChaves.length > 0 ? (encontradas / gruposChaves.length) : 0;
           if (pctItem >= 0.8) acertoFracao = 1; else if (pctItem >= 0.5) acertoFracao = 0.75; else if (pctItem >= 0.25) acertoFracao = 0.40;
         } else {
@@ -515,8 +609,7 @@
           }
           if(respAluno.replace(/\s/g, '').toLowerCase() === respEsp.replace(/\s/g, '').toLowerCase()) acertoFracao = 1;
         }
-        somaAcertos += acertoFracao;
-        notaPontos += (acertoFracao * ptsQuestao);
+        somaAcertos += acertoFracao; notaPontos += (acertoFracao * ptsQuestao);
       });
 
       let pctFinal = totalQuestoes > 0 ? Math.round((somaAcertos / totalQuestoes) * 100) : 0;
@@ -530,30 +623,15 @@
           tempoRestante: 0 
       };
 
-      fetch(URL_API_GOOGLE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(pacoteEnvio)
-      })
+      fetch(URL_API_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(pacoteEnvio) })
       .then(res => res.json())
       .then(resp => {
          if (resp.sucesso) {
-             Swal.fire({
-                title: 'Parabéns!',
-                text: 'Sua atividade foi concluída e a nota registrada!',
-                icon: 'success',
-                confirmButtonText: 'Voltar ao Painel',
-                confirmButtonColor: 'var(--primaria)'
-             }).then(() => {
-                 alternarTela('telaDashboard');
-                 carregarAtividadesPendentes(); 
-             });
+             Swal.fire({ title: 'Parabéns!', text: 'Sua atividade foi concluída!', icon: 'success', confirmButtonText: 'Voltar ao Painel', confirmButtonColor: 'var(--primaria)'})
+             .then(() => { alternarTela('telaDashboard'); carregarAtividadesPendentes(); });
          } else {
              Swal.fire('Ops', resp.erro || 'Erro ao processar', 'error');
          }
-      })
-      .catch(err => {
-         Swal.fire('Erro', 'Ocorreu um erro de rede. Print essa tela e avise o professor.', 'error');
       });
     }
   </script>
