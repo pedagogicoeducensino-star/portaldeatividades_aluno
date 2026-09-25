@@ -206,7 +206,7 @@
         });
     }
 
-    // BUSCAR PAINEL (Separando em 3 blocos)
+// BUSCAR PAINEL (Agora as seções nunca somem, mostram avisos)
     function carregarAtividadesPendentes() {
       const containerEmAndamento = document.getElementById('listaEmAndamento');
       const containerPendentes = document.getElementById('listaPendentes');
@@ -226,37 +226,40 @@
           containerConcluidas.innerHTML = '';
 
           // 1. EM ANDAMENTO
+          document.getElementById('sessaoEmAndamento').classList.remove('escondido'); // Garante que fica visível
           if(painel.em_andamento && painel.em_andamento.length > 0) {
-            document.getElementById('sessaoEmAndamento').classList.remove('escondido');
             painel.em_andamento.forEach(ativ => {
               containerEmAndamento.innerHTML += gerarCardHTML(ativ, 'andamento');
             });
           } else {
-            document.getElementById('sessaoEmAndamento').classList.add('escondido');
+            // Mensagem de vazio (Empty State)
+            containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-light rounded"><i class="fas fa-pause-circle fs-3 mb-2" style="color: #CBD5E1;"></i><br>Nenhuma avaliação pausada no momento.</div>';
           }
 
           // 2. PENDENTES (A FAZER)
+          document.getElementById('sessaoPendentes').classList.remove('escondido'); // Garante que fica visível
           if(painel.a_fazer && painel.a_fazer.length > 0) {
-             document.getElementById('sessaoPendentes').classList.remove('escondido');
              painel.a_fazer.forEach(ativ => {
                containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer');
              });
           } else {
-             containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4"><i class="fas fa-mug-hot fs-2 mb-2 text-secondary"></i><br>Nenhuma avaliação pendente.</div>';
+             // Mensagem de vazio (Empty State)
+             containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-light rounded"><i class="fas fa-mug-hot fs-3 mb-2" style="color: #CBD5E1;"></i><br>Nenhuma avaliação pendente. Tudo em dia!</div>';
           }
 
           // 3. CONCLUÍDAS (BOLETIM)
+          document.getElementById('sessaoConcluidas').classList.remove('escondido'); // Garante que fica visível
           if(painel.concluidas && painel.concluidas.length > 0) {
-             document.getElementById('sessaoConcluidas').classList.remove('escondido');
              painel.concluidas.forEach(ativ => {
                containerConcluidas.innerHTML += gerarCardHTML(ativ, 'concluida');
              });
           } else {
-             document.getElementById('sessaoConcluidas').classList.add('escondido');
+             // Mensagem de vazio (Empty State)
+             containerConcluidas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-light rounded"><i class="fas fa-medal fs-3 mb-2" style="color: #CBD5E1;"></i><br>Seu boletim está vazio. Finalize uma atividade para ver sua nota aqui.</div>';
           }
         });
     }
-
+    
     // Função auxiliar para desenhar o HTML dos Cards
     function gerarCardHTML(ativ, tipo) {
       let qtdQ = ativ.questoesOriginal ? ativ.questoesOriginal.length : 0;
