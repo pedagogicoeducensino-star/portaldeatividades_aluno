@@ -23,7 +23,7 @@
       --cinza-borda: #E2E8F0;
       --sucesso: #10B981;
       --perigo: #EF4444;
-      --fonte-padrao: 17px;
+      --fonte-padrao: 16px; /* Fonte normalizada */
     }
     
     body { background-color: var(--cinza-fundo); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--cinza-texto); font-size: var(--fonte-padrao); line-height: 1.6; }
@@ -37,8 +37,8 @@
     
     .escondido { display: none !important; }
     
-    .relogio-teste { font-size: 28px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 12px 45px; border-radius: 50px; display: inline-block; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 2px;}
-    .progress { background-color: #E2E8F0; border: none; height: 20px; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+    .relogio-teste { font-size: 24px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 10px 35px; border-radius: 50px; display: inline-block; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 2px;}
+    .progress { background-color: #E2E8F0; border: none; height: 16px; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
     .progress-bar { background: linear-gradient(90deg, var(--secundaria), var(--primaria)); transition: width 0.5s ease; border-radius: 10px; }
     
     .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--marrom-suave); transition: all 0.2s; border-radius: 10px;}
@@ -102,38 +102,36 @@
     </div>
   </div>
 
-  <!-- TELA DE INSTRUÇÕES (PRÉ-PROVA) -->
+  <!-- TELA DE INSTRUÇÕES (PRÉ-PROVA) - TOTALMENTE LIMPA E SEM REDUNDÂNCIA -->
   <div id="telaInstrucoes" class="container py-5 escondido" style="max-width: 850px;">
     <div class="card-3d card-topo-laranja text-center p-5">
-       <i class="fas fa-bullhorn mb-3" style="font-size: 60px; color: var(--secundaria);"></i>
-       <h2 class="fw-bold mb-2 text-dark" id="infoTituloProva">Título da Prova</h2>
+       <i class="fas fa-bullhorn mb-3" style="font-size: 50px; color: var(--secundaria);"></i>
+       <h2 class="fw-bold mb-4 text-dark" id="infoTituloProva">Título da Prova</h2>
        
-       <!-- ÁREA RESERVADA PARA OS ALERTAS QUE VOCÊ VAI MANDAR -->
-       <div id="areaAlertasDinamicos" class="text-start mt-4 mb-4 p-4 rounded bg-light border border-warning shadow-sm">
-           <h5 class="fw-bold text-dark mb-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i> Instruções e Regras:</h5>
-           <p class="text-muted mb-0"><em>(Espaço reservado. Cole as instruções e os alertas específicos aqui quando me enviar o texto.)</em></p>
-       </div>
-       
-       <div class="row text-start mb-5 g-4">
-          <div class="col-md-6">
-             <div class="box-info h-100 mb-0">
-                <i class="fas fa-ban text-danger fs-4 mb-2"></i><br>
-                <strong>Sistema Anti-Cola:</strong> A cópia de textos de fora é bloqueada. O sistema detecta se você trocar de aba e o <u>tempo da questão será zerado</u>.
-             </div>
-          </div>
-          <div class="col-md-6">
-             <div class="box-info h-100 mb-0">
-                <i class="fas fa-save text-success fs-4 mb-2"></i><br>
-                <strong>Salvar e Sair:</strong> Se a aula acabar ou houver imprevisto, clique em "Salvar e Sair" no topo da prova. Seu progresso ficará guardado.
-             </div>
-          </div>
+       <!-- ÁREA ÚNICA DE INSTRUÇÕES (Texto Oficial) -->
+       <div class="text-start mb-4 p-4 rounded shadow-sm" style="background-color: #FFFBEB; border: 1px solid var(--secundaria);">
+           <h5 class="fw-bold text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i> ATENÇÃO!</h5>
+           <p class="fw-bold text-dark mb-4">Antes de iniciar, leia as orientações:</p>
+           
+           <ul class="list-unstyled text-dark mb-4" style="line-height: 1.7;">
+               <li class="mb-2">⏱️ <strong>Tempo:</strong> cada questão possui um tempo mínimo. Você pode ultrapassá-lo, mas não poderá avançar antes do término.</li>
+               <li class="mb-2">🚫 <strong>Não copie e cole:</strong> as respostas devem ser elaboradas pelo próprio aluno.</li>
+               <li class="mb-2">📚 <strong>Material:</strong> utilize sua apostila como apoio. Caso não tenha recebido, procure a Secretaria.</li>
+               <li class="mb-2">📵 <strong>Celular e outras fontes:</strong> não é aconselhável utilizá-los para responder à atividade. O objetivo é aperfeiçoar e verificar seus conhecimentos.</li>
+               <li class="mb-2">💾 <strong>Salve sua atividade:</strong> se não concluir durante a aula, salve antes de sair para continuar posteriormente.</li>
+               <li class="mb-2">👨‍🏫 <strong>Dúvidas:</strong> chame o(a) professor(a) em sala para receber orientação.</li>
+           </ul>
+           
+           <div class="p-3 text-center rounded fw-bold shadow-sm" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">
+              Boa atividade! Faça com atenção e confiança no que você aprendeu.
+           </div>
        </div>
        
        <h5 class="mb-4">Total de Questões: <strong id="infoQtdQuestoes" style="color: var(--primaria);">0</strong></h5>
        
        <div class="d-flex justify-content-center gap-3">
-          <button class="btn btn-secondary btn-lg rounded-pill px-4" onclick="alternarTela('telaDashboard')"><i class="fas fa-arrow-left me-2"></i> Voltar</button>
-          <button class="btn btn-primario btn-lg rounded-pill px-5" onclick="prepararExecucao()"><i class="fas fa-flag-checkered me-2"></i> Estou Ciente, Começar!</button>
+          <button class="btn btn-secondary rounded-pill px-4" onclick="alternarTela('telaDashboard')"><i class="fas fa-arrow-left me-2"></i> Voltar</button>
+          <button class="btn btn-primario rounded-pill px-5" onclick="prepararExecucao()"><i class="fas fa-flag-checkered me-2"></i> Estou Ciente, Começar!</button>
        </div>
     </div>
   </div>
@@ -164,7 +162,7 @@
     </div>
 
     <div class="text-center mt-4 pb-5">
-      <button id="btnAvancar" class="btn btn-secondary w-100 shadow fw-bold mb-3" disabled onclick="avancarQuestao()" style="padding: 18px; font-size: 20px; border-radius: 15px;">
+      <button id="btnAvancar" class="btn btn-secondary w-100 shadow fw-bold mb-3" disabled onclick="avancarQuestao()" style="padding: 16px; font-size: 18px; border-radius: 12px;">
         Aguarde o tempo...
       </button>
     </div>
@@ -184,7 +182,7 @@
     let tempoRestante = 0;
     let timerIntervalo = null;
 
-    // BLOQUEIOS ANTI-COLA E MUDANÇA DE ABA (CORRIGIDO)
+    // BLOQUEIOS ANTI-COLA E MUDANÇA DE ABA
     document.addEventListener('copy', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
     document.addEventListener('cut', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
     document.addEventListener('paste', function(e) { 
@@ -195,10 +193,8 @@
 
     document.addEventListener("visibilitychange", () => {
         if (document.hidden && !document.getElementById('telaExecucaoProva').classList.contains('escondido')) {
-             // 1. PAUSA O CRONÔMETRO IMEDIATAMENTE AO SAIR DA ABA
              clearInterval(timerIntervalo);
              
-             // 2. MOSTRA O ALERTA E AGUARDA O ALUNO CLICAR "ESTOU CIENTE"
              Swal.fire({
                 title: '⚠️ ALERTA DE FOCO!',
                 html: 'Você saiu da aba da atividade.<br><br>Como regra de segurança, <b>o tempo desta questão foi reiniciado</b>. Mantenha o foco até concluir!',
@@ -208,7 +204,6 @@
                 confirmButtonText: 'Estou ciente, vou focar'
              }).then((result) => {
                 if (result.isConfirmed) {
-                    // 3. SOMENTE AGORA O TEMPO RESSIGNIFICA E VOLTA A CONTAR
                     const q = cadernoAtivo.questoesOriginal[indiceAtual];
                     tempoRestante = parseInt(q.tempo || 60);
                     
@@ -342,7 +337,7 @@
           <div class="col-md-6">
             <div class="p-4 bg-white border rounded shadow-sm h-100" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="p-3 text-center rounded fw-bold fs-5 mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Nota Recebida: ${ativ.nota || 'Aguardando'}</div>
+              <div class="p-3 text-center rounded fw-bold mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Nota Recebida: ${ativ.nota || 'Aguardando'}</div>
             </div>
           </div>`;
       }
@@ -361,17 +356,16 @@
     }
 
     function prepararExecucao() {
-      // 1. SILENT SAVE: Move a atividade de Pendente para Em Andamento no servidor na hora que clica em "Começar"
       fetch(URL_API_GOOGLE, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
               api: 'salvarProgresso',
               linhaPlanilha: cadernoAtivo.linhaPlanilha,
-              respostas: cadernoAtivo.respostasSalvas || [], // Envia array vazio ou o que já tinha
+              respostas: cadernoAtivo.respostasSalvas || [], 
               tempoRestante: 0 
           })
-      }); // Chamada em background, não atrapalha o carregamento.
+      }); 
 
       if (cadernoAtivo.respostasSalvas && cadernoAtivo.respostasSalvas.length === cadernoAtivo.questoesOriginal.length) {
           respostasAluno = cadernoAtivo.respostasSalvas;
@@ -410,32 +404,32 @@
       if(q.tipo === "estudo_caso") html += '<div class="estudo-caso-box shadow-sm">' + (q.contexto || "").replace(/\n/g, '<br>') + '</div>';
       
       if(q.tipo === "lacunas") {
-        let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:45px;" oninput="verificarPreenchimento()">');
-        html += '<p class="fw-bold mb-4 text-dark fs-5">' + enunciadoFmt + '</p>';
-      } else if(q.tipo !== "assercao_razao") { html += '<p class="fw-bold mb-4 text-dark fs-4" style="line-height: 1.5;">' + (q.enunciado || "") + '</p>'; }
+        let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:40px; font-size:16px;" oninput="verificarPreenchimento()">');
+        html += '<p class="fw-bold mb-4 text-dark">' + enunciadoFmt + '</p>';
+      } else if(q.tipo !== "assercao_razao") { html += '<p class="fw-bold mb-4 text-dark" style="line-height: 1.5;">' + (q.enunciado || "") + '</p>'; }
 
       if (q.tipo === "multipla_escolha") {
         ['A','B','C','D','E'].forEach(l => { 
-            if(q.opcoes && q.opcoes[l]) { html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3 mt-1" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100 fs-5" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; }
+            if(q.opcoes && q.opcoes[l]) { html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3 mt-1" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; }
         });
       } else if (q.tipo === "certo_errado") {
-        html += `<div class="d-flex gap-4 mb-3"><div class="form-check p-4 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Certo" id="opt_C" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-success w-100 fs-4" for="opt_C" style="cursor:pointer;">CERTO</label></div><div class="form-check p-4 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Errado" id="opt_E" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-danger w-100 fs-4" for="opt_E" style="cursor:pointer;">ERRADO</label></div></div>`;
+        html += `<div class="d-flex gap-4 mb-3"><div class="form-check p-3 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Certo" id="opt_C" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-success w-100" for="opt_C" style="cursor:pointer;">CERTO</label></div><div class="form-check p-3 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Errado" id="opt_E" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-danger w-100" for="opt_E" style="cursor:pointer;">ERRADO</label></div></div>`;
       } else if (q.tipo === "assercao_razao") {
-        html += `<div class="bg-light p-4 rounded mb-4 border shadow-sm"><p class="mb-2 fw-bold fs-5">I. ${q.assercao}</p><div class="text-danger fw-bold my-3 text-center"><i class="fas fa-link"></i> PORQUE</div><p class="mb-0 fw-bold fs-5">II. ${q.razao}</p></div>`;
+        html += `<div class="bg-light p-4 rounded mb-4 border shadow-sm"><p class="mb-2 fw-bold">I. ${q.assercao}</p><div class="text-danger fw-bold my-3 text-center"><i class="fas fa-link"></i> PORQUE</div><p class="mb-0 fw-bold">II. ${q.razao}</p></div>`;
         let assOpcoes = [ {v: "I", t: "I. A afirmação I é verdadeira, e a II é verdadeira, e a II justifica a I."}, {v: "II", t: "II. A afirmação I é verdadeira, e a II é verdadeira, mas a II não justifica a I."}, {v: "III", t: "III. A afirmação I é verdadeira, e a II é falsa."}, {v: "IV", t: "IV. A afirmação I é falsa, e a II é verdadeira."}, {v: "V", t: "V. A afirmação I é falsa, e a II é falsa."} ];
-        assOpcoes.forEach(op => { html += `<div class="form-check mb-3 p-3 rounded bg-light border"><input class="form-check-input ms-1 me-3 mt-1" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label fs-6" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`; });
+        assOpcoes.forEach(op => { html += `<div class="form-check mb-3 p-3 rounded bg-light border"><input class="form-check-input ms-1 me-3 mt-1" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`; });
       } else if (q.tipo === "associacao") {
-        html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`; (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm fs-5"><strong>${idx+1}.</strong> ${item}</div>`; }); html += `</div><div class="col-sm-7 ps-4">`;
+        html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`; (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm"><strong>${idx+1}.</strong> ${item}</div>`; }); html += `</div><div class="col-sm-7 ps-4">`;
         (q.colunaB || []).forEach((item, idx) => { 
-          let dItem = (q.b_is_img && item.startsWith('http')) ? `<img src="${item}" class="rounded border" style="max-height:60px;">` : `<span class="fw-bold fs-5">${item}</span>`;
-          html += `<div class="d-flex align-items-center mb-3 bg-white p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:50px; height:50px; font-size:20px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
+          let dItem = (q.b_is_img && item.startsWith('http')) ? `<img src="${item}" class="rounded border" style="max-height:60px;">` : `<span class="fw-bold">${item}</span>`;
+          html += `<div class="d-flex align-items-center mb-3 bg-white p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:45px; height:45px; font-size:16px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
         }); html += `</div></div>`;
       } else if (q.tipo === "ordenacao") {
-        q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark fs-5">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:60px; height:50px; font-size:20px;" oninput="verificarPreenchimento()"></div></div>`; });
+        q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:45px; height:45px; font-size:16px;" oninput="verificarPreenchimento()"></div></div>`; });
       } else if (q.tipo === "verdadeiro_falso_mult") {
-        q.lista.forEach(item => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-4 p-0 text-uppercase" style="width:55px; height:50px; font-weight:800; font-size:20px;" maxlength="1" oninput="verificarPreenchimento()"><span class="fw-bold text-dark fs-5">${item}</span></div>`; });
+        q.lista.forEach(item => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-4 p-0 text-uppercase" style="width:45px; height:45px; font-weight:800; font-size:16px;" maxlength="1" oninput="verificarPreenchimento()"><span class="fw-bold text-dark">${item}</span></div>`; });
       } else if (q.tipo !== "lacunas") {
-        html += `<textarea class="form-control in-teste p-4 shadow-sm fs-5" style="border: 2px solid var(--primaria); font-weight: 600; background-color: #FFFBEB; border-radius: 12px;" rows="6" placeholder="Digite sua resposta com as próprias palavras aqui..." oninput="verificarPreenchimento()"></textarea>`;
+        html += `<textarea class="form-control in-teste p-3 shadow-sm" style="border: 2px solid var(--primaria); font-weight: 600; background-color: #FFFBEB; border-radius: 12px;" rows="6" placeholder="Digite sua resposta com as próprias palavras aqui..." oninput="verificarPreenchimento()"></textarea>`;
       }
       
       document.getElementById('areaQuestaoAtiva').innerHTML = html + '</div>';
@@ -448,7 +442,6 @@
       clearInterval(timerIntervalo);
       timerIntervalo = setInterval(tickTempo, 1000);
       
-      // Força verificação caso não tenha campo de input (ex: apenas leitura se houver erro)
       verificarPreenchimento();
     }
 
@@ -462,12 +455,12 @@
       atualizarRelogioHTML();
       if(tempoRestante <= 0) { 
           clearInterval(timerIntervalo); 
-          verificarPreenchimento(); // Destrava o botão quando o tempo acaba
+          verificarPreenchimento(); 
       }
     }
 
     function verificarPreenchimento() {
-      if(tempoRestante > 0) return; // Se ainda tem tempo, não faz nada
+      if(tempoRestante > 0) return; 
       
       let respondeu = false;
       const radios = document.querySelectorAll('#areaQuestaoAtiva input[type="radio"]:checked');
@@ -481,7 +474,7 @@
       }
 
       const btn = document.getElementById('btnAvancar');
-      if(respondeu || (radios.length === 0 && inputs.length === 0)) { // Garante liberação mesmo que a questão não tenha input detectado
+      if(respondeu || (radios.length === 0 && inputs.length === 0)) { 
         btn.disabled = false;
         btn.style.backgroundColor = "var(--sucesso)";
         btn.style.color = "white";
