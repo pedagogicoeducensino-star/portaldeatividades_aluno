@@ -12,12 +12,13 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <style>
-    /* PALETA TERROSA E QUENTE APLICADA AO ALUNO */
+    /* PALETA OFICIAL (Laranja, Dourado, Marrom, Creme e Cinza Claro) */
     :root { 
       --primaria: #F97316; 
       --primaria-hover: #EA580C;
       --secundaria: #F59E0B; 
       --marrom-suave: #78350F;
+      --marrom-claro: #D97706;
       --cinza-fundo: #F8FAFC;
       --cinza-card: #FFFFFF;
       --cinza-texto: #334155;
@@ -54,7 +55,7 @@
     <div class="text-center mb-4">
       <div class="mb-3"><i class="fas fa-user-graduate" style="font-size: 50px; color: var(--primaria);"></i></div>
       <h2 class="fw-bold mb-1" style="color: var(--marrom-suave);">Portal do Aluno</h2>
-      <p class="text-muted small">Acesse suas atividades pendentes</p>
+      <p class="text-muted small">Acesse suas atividades</p>
     </div>
     <div class="mb-4">
       <label class="form-label fw-bold text-secondary">Nº da Matrícula:</label>
@@ -87,7 +88,7 @@
     </div>
   </div>
 
-  <!-- TELA DE EXECUÇÃO DA PROVA (AMBIENTE CONTROLADO) -->
+  <!-- TELA DE EXECUÇÃO DA PROVA -->
   <div id="telaExecucaoProva" class="container py-4 escondido" style="max-width: 750px;">
     <div class="mb-4 text-center">
       <div class="relogio-teste mx-auto mb-4" id="relogioTeste"><i class="fas fa-stopwatch"></i> 0s</div>
@@ -114,11 +115,12 @@
 
   <script>
     // =========================================================================
-    // COLE AQUI A NOVA URL DE IMPLANTAÇÃO DO SEU GOOGLE APPS SCRIPT
+    // COLE AQUI A SUA URL DO GOOGLE APPS SCRIPT (A MESMA DO PROFESSOR)
     // =========================================================================
-    const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzEjn_R54vUXpglydH_z669p53Smxw84wt7gm9KPdQSlp5rMHovbxb7-pq7MSWv6Mfd/exec";
+    const URL_API_GOOGLE = "COLE AQUI SUA URL DO APPS SCRIPT";
     
     let dadosAluno = null;
+    let painelCompleto = null;
     let cadernoAtivo = null;
     let indiceAtual = 0;
     let respostasAluno = [];
@@ -136,7 +138,7 @@
       alternarTela('telaLogin');
     }
 
-    // LOGIN DO ALUNO
+    // 1. LOGIN UTILIZANDO A ROTA DO SEU GS (api=loginAluno)
     function fazerLoginAluno() {
       const matricula = document.getElementById('inputMatricula').value.trim();
       if(!matricula) {
@@ -155,8 +157,8 @@
           btn.disabled = false;
 
           if(resp.sucesso) {
-            dadosAluno = resp.aluno;
-            document.getElementById('nomeAlunoDisplay').innerText = dadosAluno.nome;
+            dadosAluno = { matricula: matricula, nome: resp.nome };
+            document.getElementById('nomeAlunoDisplay').innerText = resp.nome;
             alternarTela('telaDashboard');
             carregarAtividadesPendentes();
           } else {
@@ -170,48 +172,62 @@
         });
     }
 
-    // CARREGAR ATIVIDADES DO ALUNO
+    // 2. BUSCAR PAINEL UTILIZANDO A ROTA DO SEU GS (api=painelAluno)
     function carregarAtividadesPendentes() {
       const lista = document.getElementById('listaAtividades');
       lista.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="fas fa-spinner fa-spin fs-3"></i><br>Buscando suas provas...</div>';
 
-      fetch(`${URL_API_GOOGLE}?api=obterAtividadesAluno&matricula=${dadosAluno.matricula}`)
+      fetch(`${URL_API_GOOGLE}?api=painelAluno&matricula=${dadosAluno.matricula}`)
         .then(res => res.json())
-        .then(atividades => {
+        .then(painel => {
+          painelCompleto = painel;
           lista.innerHTML = "";
           
-          if(!atividades || atividades.length === 0) {
+          // Junta as provas 'a_fazer' e 'em_andamento' do seu GS
+          let pendentes = [...painel.a_fazer, ...painel.em_andamento];
+          
+          if(pendentes.length === 0) {
             lista.innerHTML = '<div class="col-12 text-center text-muted py-5 bg-light rounded border"><i class="fas fa-mug-hot fs-1 mb-3 text-secondary"></i><br><h5 class="fw-bold">Tudo em dia!</h5>Nenhuma atividade pendente para você no momento.</div>';
             return;
           }
 
-          atividades.forEach(ativ => {
-            if(ativ.status === 'Concluído') return; 
-
+          pendentes.forEach(ativ => {
+            let labelStatus = ativ.status === 'Em Andamento' 
+              ? '<span class="badge bg-warning text-dark"><i class="fas fa-play"></i> Em Andamento</span>' 
+              : '<span class="badge bg-primary"><i class="fas fa-clock"></i> Pendente</span>';
+              
             lista.innerHTML += `
               <div class="col-md-6">
                 <div class="p-4 bg-white border rounded shadow-sm hover-shadow transition d-flex flex-column h-100" style="border-left: 4px solid var(--primaria);">
-                  <h5 class="fw-bold text-dark mb-2">${ativ.titulo}</h5>
-                  <div class="mb-3 small text-muted">
-                    <i class="far fa-clock"></i> Prazo: ${ativ.prazo || 'Sem prazo limíte'} <br>
-                    <i class="fas fa-list-ol"></i> Questões: ${ativ.qtdQuestoes}
+                  <div class="d-flex justify-content-between mb-2">
+                      <h5 class="fw-bold text-dark mb-0">${ativ.titulo}</h5>
+                      ${labelStatus}
+                  </div>
+                  <div class="mb-3 small text-muted mt-2">
+                    <i class="far fa-clock"></i> Prazo: ${ativ.prazo} <br>
+                    <i class="fas fa-list-ol"></i> Questões: ${ativ.questoesOriginal ? ativ.questoesOriginal.length : 0}
                   </div>
                   <div class="mt-auto">
-                    <button class="btn btn-primario w-100 fw-bold" onclick="iniciarProva('${ativ.idCaderno}')"><i class="fas fa-pen me-2"></i> Iniciar Agora</button>
+                    <button class="btn btn-primario w-100 fw-bold" onclick="iniciarProva(${ativ.linhaPlanilha})"><i class="fas fa-pen me-2"></i> Iniciar Agora</button>
                   </div>
                 </div>
               </div>
             `;
           });
-          
-          if(lista.innerHTML === "") {
-             lista.innerHTML = '<div class="col-12 text-center text-muted py-5 bg-light rounded border"><h5 class="fw-bold">Tudo em dia!</h5>Nenhuma atividade pendente.</div>';
-          }
         });
     }
 
-    // INICIAR A PROVA
-    function iniciarProva(idCaderno) {
+    // 3. INICIAR A PROVA
+    function iniciarProva(linhaPlanilha) {
+      // Procura a atividade selecionada dentro do que o GS enviou
+      let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
+      cadernoAtivo = pendentes.find(p => p.linhaPlanilha === linhaPlanilha);
+      
+      if(!cadernoAtivo || !cadernoAtivo.questoesOriginal || cadernoAtivo.questoesOriginal.length === 0) {
+          Swal.fire('Atenção', 'As questões desta prova não estão disponíveis.', 'warning');
+          return;
+      }
+
       Swal.fire({
         title: 'Pronto para começar?',
         text: "O tempo de cada questão não pode ser pausado após o início.",
@@ -222,42 +238,30 @@
         confirmButtonText: 'Sim, Começar!'
       }).then((result) => {
         if (result.isConfirmed) {
-            Swal.showLoading();
-            fetch(`${URL_API_GOOGLE}?api=obterProvaCompleta&idCaderno=${idCaderno}`)
-              .then(res => res.json())
-              .then(prova => {
-                 Swal.close();
-                 if(!prova.questoes) {
-                     Swal.fire('Erro', 'Prova não encontrada ou sem questões.', 'error'); return;
-                 }
-                 
-                 cadernoAtivo = prova;
-                 
-                 if(cadernoAtivo.embaralhar) {
-                     cadernoAtivo.questoes = cadernoAtivo.questoes.sort(() => Math.random() - 0.5);
-                 }
-
-                 respostasAluno = new Array(cadernoAtivo.questoes.length).fill(null);
-                 indiceAtual = 0;
-                 alternarTela('telaExecucaoProva');
-                 renderizarQuestao();
-              });
+            // Embaralha se o professor configurou
+            if(cadernoAtivo.embaralhar) {
+                cadernoAtivo.questoesOriginal = cadernoAtivo.questoesOriginal.sort(() => Math.random() - 0.5);
+            }
+            respostasAluno = new Array(cadernoAtivo.questoesOriginal.length).fill(null);
+            indiceAtual = 0;
+            alternarTela('telaExecucaoProva');
+            renderizarQuestao();
         }
       });
     }
 
-    // RENDERIZAR QUESTÃO
+    // 4. RENDERIZAR A QUESTÃO NA TELA
     function renderizarQuestao() {
-      if(indiceAtual >= cadernoAtivo.questoes.length) { 
+      if(indiceAtual >= cadernoAtivo.questoesOriginal.length) { 
           finalizarEEnviarProva(); 
           return; 
       }
       
-      const q = cadernoAtivo.questoes[indiceAtual];
+      const q = cadernoAtivo.questoesOriginal[indiceAtual];
       tempoRestante = parseInt(q.tempo || 60);
       
       let numAtual = indiceAtual + 1;
-      let totalQ = cadernoAtivo.questoes.length;
+      let totalQ = cadernoAtivo.questoesOriginal.length;
       let pct = Math.round(((indiceAtual) / totalQ) * 100);
       
       document.getElementById('textoProgresso').innerText = 'Questão ' + numAtual + ' de ' + totalQ;
@@ -358,7 +362,7 @@
         btn.disabled = false;
         btn.style.backgroundColor = "var(--sucesso)";
         btn.style.color = "white";
-        btn.innerHTML = (indiceAtual === cadernoAtivo.questoes.length - 1) ? 'Finalizar Prova <i class="fas fa-flag-checkered ms-2"></i>' : 'Confirmar Resposta <i class="fas fa-arrow-right ms-2"></i>';
+        btn.innerHTML = (indiceAtual === cadernoAtivo.questoesOriginal.length - 1) ? 'Finalizar Prova <i class="fas fa-flag-checkered ms-2"></i>' : 'Confirmar Resposta <i class="fas fa-arrow-right ms-2"></i>';
       } else {
         btn.disabled = true;
         btn.style.backgroundColor = "#6c757d";
@@ -367,7 +371,7 @@
     }
 
     function avancarQuestao() {
-      const q = cadernoAtivo.questoes[indiceAtual];
+      const q = cadernoAtivo.questoesOriginal[indiceAtual];
       if(["multipla_escolha", "certo_errado", "assercao_razao"].includes(q.tipo)) {
         const rad = document.querySelector('input[name="respProva"]:checked');
         respostasAluno[indiceAtual] = rad ? rad.value : "";
@@ -381,20 +385,20 @@
       renderizarQuestao();
     }
 
-    // ENVIAR PARA O SERVIDOR
+    // 5. ENVIAR PARA O SEU GS (api=finalizarAtividade)
     function finalizarEEnviarProva() {
       Swal.fire({
           title: 'Finalizando...',
-          text: 'Enviando suas respostas para o professor.',
+          text: 'Enviando suas respostas e corrigindo a prova.',
           allowOutsideClick: false,
           didOpen: () => { Swal.showLoading(); }
       });
 
       let somaAcertos = 0; 
-      let totalQuestoes = cadernoAtivo.questoes.length;
+      let totalQuestoes = cadernoAtivo.questoesOriginal.length;
       let notaPontos = 0;
 
-      cadernoAtivo.questoes.forEach((q, i) => {
+      cadernoAtivo.questoesOriginal.forEach((q, i) => {
         let respAluno = respostasAluno[i] || "";
         let ptsQuestao = parseFloat(q.pontos) || 0;
         let acertoFracao = 0;
@@ -423,12 +427,13 @@
       let pctFinal = totalQuestoes > 0 ? Math.round((somaAcertos / totalQuestoes) * 100) : 0;
       let notaString = pctFinal + "% (" + notaPontos + " pts)";
 
+      // Usando exatamente os dados que o seu doPost(finalizarAtividade) espera
       let pacoteEnvio = {
-          api: 'salvarRespostaAluno',
-          matricula: dadosAluno.matricula,
-          idCaderno: cadernoAtivo.idCaderno,
+          api: 'finalizarAtividade',
+          linhaPlanilha: cadernoAtivo.linhaPlanilha,
           respostas: respostasAluno,
-          nota: notaString
+          notaFinal: notaString,
+          tempoRestante: 0 // Zera o tempo pois terminou
       };
 
       fetch(URL_API_GOOGLE, {
@@ -438,19 +443,23 @@
       })
       .then(res => res.json())
       .then(resp => {
-         Swal.fire({
-            title: 'Parabéns!',
-            text: 'Sua atividade foi concluída e enviada com sucesso.',
-            icon: 'success',
-            confirmButtonText: 'Voltar ao Início',
-            confirmButtonColor: 'var(--primaria)'
-         }).then(() => {
-             alternarTela('telaDashboard');
-             carregarAtividadesPendentes(); 
-         });
+         if (resp.sucesso) {
+             Swal.fire({
+                title: 'Parabéns!',
+                text: 'Sua atividade foi concluída e a nota registrada!',
+                icon: 'success',
+                confirmButtonText: 'Voltar ao Painel',
+                confirmButtonColor: 'var(--primaria)'
+             }).then(() => {
+                 alternarTela('telaDashboard');
+                 carregarAtividadesPendentes(); // Recarrega a tela, a prova já vai constar como 'Concluído' e sumir daqui
+             });
+         } else {
+             Swal.fire('Ops', resp.erro || 'Erro ao processar', 'error');
+         }
       })
       .catch(err => {
-         Swal.fire('Erro', 'Ocorreu um erro ao salvar sua prova. Tire um print da tela e avise seu professor.', 'error');
+         Swal.fire('Erro', 'Ocorreu um erro de rede. Print essa tela e avise o professor.', 'error');
       });
     }
   </script>
