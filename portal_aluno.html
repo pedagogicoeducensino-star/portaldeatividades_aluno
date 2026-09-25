@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área do Aluno - Portal de Atividades</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    :root { 
+      --primaria: #0284C7; /* Azul para diferenciar da área do professor */
+      --primaria-hover: #0369A1;
+      --secundaria: #38BDF8; 
+      --cinza-fundo: #F8FAFC;
+      --cinza-card: #FFFFFF;
+      --cinza-texto: #334155;
+      --cinza-borda: #E2E8F0;
+      --sucesso: #10B981; 
+      --fonte-padrao: 16px;
+    }
+    
+    body { background-color: var(--cinza-fundo); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--cinza-texto); font-size: var(--fonte-padrao); line-height: 1.6; }
+    
+    .card-3d { background: var(--cinza-card); border-radius: 16px; padding: 28px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03); border: 1px solid var(--cinza-borda); border-top: 5px solid var(--primaria); margin-bottom: 24px; }
+    
+    .btn-primario { background-color: var(--primaria); color: white; border: none; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2); font-weight: 600; padding: 12px 20px; border-radius: 8px; transition: all 0.2s;}
+    .btn-primario:hover { background-color: var(--primaria-hover); color: white; transform: translateY(-2px); }
+    
+    .escondido { display: none !important; }
+    
+    /* Estilos do Teste (Herdados do Simulador) */
+    .relogio-teste { font-size: 26px !important; font-weight: 800; color: white; background: var(--primaria-hover); padding: 12px 40px; border-radius: 50px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.1); letter-spacing: 1px;}
+    .progress { background-color: #F1F5F9; border: 1px solid var(--cinza-borda); }
+    .progress-bar { background: linear-gradient(90deg, var(--secundaria), var(--primaria)); transition: width 0.5s ease; }
+    
+    .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--primaria-hover); transition: all 0.2s; border-radius: 8px;}
+    .input-box-destaque:focus { outline: none; border-color: var(--primaria); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); background-color: white;}
+    
+    .estudo-caso-box { background-color: #F0F9FF; border-left: 4px solid var(--primaria); padding: 18px; border-radius: 8px; margin-bottom: 18px; font-style: italic; color: #0C4A6E; }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE LOGIN DO ALUNO -->
+  <div id="telaLogin" class="card-3d mx-auto shadow-sm" style="max-width: 400px; margin-top: 15vh;">
+    <div class="text-center mb-4">
+      <div class="mb-3"><i class="fas fa-user-graduate" style="font-size: 50px; color: var(--primaria);"></i></div>
+      <h2 class="fw-bold mb-1" style="color: var(--primaria-hover);">Portal do Aluno</h2>
+      <p class="text-muted small">Acesse suas atividades pendentes</p>
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-bold text-secondary">Nº da Matrícula:</label>
+      <div class="input-group">
+        <span class="input-group-text bg-light border-end-0"><i class="fas fa-id-card text-muted"></i></span>
+        <input type="text" id="inputMatricula" class="form-control border-start-0" placeholder="Digite sua matrícula..." onkeypress="if(event.key === 'Enter') fazerLoginAluno()">
+      </div>
+    </div>
+    <button class="btn btn-primario w-100 fs-5" onclick="fazerLoginAluno()" id="btnLogin">Entrar <i class="fas fa-arrow-right"></i></button>
+  </div>
+
+  <!-- TELA DASHBOARD (ATIVIDADES) -->
+  <div id="telaDashboard" class="container py-4 escondido" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4 card-3d py-3 shadow-sm" style="border-top-color: var(--secundaria);">
+      <div class="d-flex align-items-center gap-3">
+        <div class="bg-light p-3 rounded-circle text-center" style="width: 50px; height: 50px; line-height: 20px;"><i class="fas fa-user text-primary"></i></div>
+        <div>
+          <h2 class="mb-0 fs-4 fw-bold text-dark">Minhas Atividades</h2>
+          <span class="text-muted small">Aluno: <strong id="nomeAlunoDisplay" class="text-dark"></strong></span>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-outline-danger fw-bold" onclick="sair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+
+    <div class="card-3d" style="border-top: none;">
+      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-tasks text-primary me-2"></i> Avaliações Pendentes</h5>
+      <div id="listaAtividades" class="row g-3">
+        <!-- Cards de provas serão injetados aqui -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA DE EXECUÇÃO DA PROVA (AMBIENTE CONTROLADO) -->
+  <div id="telaExecucaoProva" class="container py-4 escondido" style="max-width: 750px;">
+    <div class="mb-4 text-center">
+      <div class="relogio-teste mx-auto mb-4" id="relogioTeste"><i class="fas fa-stopwatch"></i> 0s</div>
+      
+      <div class="d-flex justify-content-between align-items-end mb-2 px-2">
+        <span class="fw-bold text-secondary fs-5" id="textoProgresso">Questão 1 de X</span>
+        <span class="fw-bold" style="color: var(--primaria);" id="percentualProgresso">0%</span>
+      </div>
+      <div class="progress shadow-sm" style="height: 18px; border-radius: 10px;">
+        <div id="barraProgresso" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <div id="areaQuestaoAtiva" class="card-3d shadow-sm mb-4" style="border-top-width: 6px; min-height: 250px;">
+      <!-- Questão será renderizada aqui -->
+    </div>
+
+    <div class="text-center mt-4 pb-5">
+      <button id="btnAvancar" class="btn btn-secondary w-100 shadow-sm fw-bold mb-3" disabled onclick="avancarQuestao()" style="padding: 16px; font-size: 18px; border-radius: 12px;">
+        Aguarde o tempo...
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // COLE AQUI A MESMA URL DO GOOGLE APPS SCRIPT USADA NO PORTAL DO PROFESSOR
+    // =========================================================================
+    const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzEjn_R54vUXpglydH_z669p53Smxw84wt7gm9KPdQSlp5rMHovbxb7-pq7MSWv6Mfd/exec";
+    
+    let dadosAluno = null;
+    let cadernoAtivo = null;
+    let indiceAtual = 0;
+    let respostasAluno = [];
+    let tempoRestante = 0;
+    let timerIntervalo = null;
+
+    function alternarTela(idTela) {
+      document.querySelectorAll('.container, #telaLogin').forEach(el => el.classList.add('escondido'));
+      document.getElementById(idTela).classList.remove('escondido');
+    }
+
+    function sair() {
+      dadosAluno = null;
+      document.getElementById('inputMatricula').value = "";
+      alternarTela('telaLogin');
+    }
+
+    // 1. LOGIN DO ALUNO
+    function fazerLoginAluno() {
+      const matricula = document.getElementById('inputMatricula').value.trim();
+      if(!matricula) {
+        Swal.fire('Atenção', 'Digite sua matrícula para entrar.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btnLogin');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
+      btn.disabled = true;
+
+      // Chama a API passando a matrícula
+      fetch(`${URL_API_GOOGLE}?api=loginAluno&matricula=${matricula}`)
+        .then(res => res.json())
+        .then(resp => {
+          btn.innerHTML = 'Entrar <i class="fas fa-arrow-right"></i>';
+          btn.disabled = false;
+
+          if(resp.sucesso) {
+            dadosAluno = resp.aluno;
+            document.getElementById('nomeAlunoDisplay').innerText = dadosAluno.nome;
+            alternarTela('telaDashboard');
+            carregarAtividadesPendentes();
+          } else {
+            Swal.fire('Acesso Negado', resp.msg || 'Matrícula não encontrada ou bloqueada.', 'error');
+          }
+        })
+        .catch(err => {
+          btn.innerHTML = 'Entrar <i class="fas fa-arrow-right"></i>';
+          btn.disabled = false;
+          Swal.fire('Erro', 'Falha na conexão com o servidor.', 'error');
+        });
+    }
+
+    // 2. CARREGAR ATIVIDADES DO ALUNO
+    function carregarAtividadesPendentes() {
+      const lista = document.getElementById('listaAtividades');
+      lista.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="fas fa-spinner fa-spin fs-3"></i><br>Buscando suas provas...</div>';
+
+      fetch(`${URL_API_GOOGLE}?api=obterAtividadesAluno&matricula=${dadosAluno.matricula}`)
+        .then(res => res.json())
+        .then(atividades => {
+          lista.innerHTML = "";
+          
+          if(!atividades || atividades.length === 0) {
+            lista.innerHTML = '<div class="col-12 text-center text-muted py-5 bg-light rounded border"><i class="fas fa-mug-hot fs-1 mb-3 text-secondary"></i><br><h5 class="fw-bold">Tudo em dia!</h5>Nenhuma atividade pendente para você no momento.</div>';
+            return;
+          }
+
+          atividades.forEach(ativ => {
+            // Se já concluiu, não mostra ou mostra bloqueado (depende da sua regra de negócio)
+            if(ativ.status === 'Concluído') return; 
+
+            lista.innerHTML += `
+              <div class="col-md-6">
+                <div class="p-4 bg-white border rounded shadow-sm hover-shadow transition d-flex flex-column h-100" style="border-left: 4px solid var(--primaria);">
+                  <h5 class="fw-bold text-dark mb-2">${ativ.titulo}</h5>
+                  <div class="mb-3 small text-muted">
+                    <i class="far fa-clock"></i> Prazo: ${ativ.prazo || 'Sem prazo limíte'} <br>
+                    <i class="fas fa-list-ol"></i> Questões: ${ativ.qtdQuestoes}
+                  </div>
+                  <div class="mt-auto">
+                    <button class="btn btn-primario w-100 fw-bold" onclick="iniciarProva('${ativ.idCaderno}')"><i class="fas fa-pen me-2"></i> Iniciar Agora</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          
+          if(lista.innerHTML === "") {
+             lista.innerHTML = '<div class="col-12 text-center text-muted py-5 bg-light rounded border"><h5 class="fw-bold">Tudo em dia!</h5>Nenhuma atividade pendente.</div>';
+          }
+        });
+    }
+
+    // 3. INICIAR A PROVA
+    function iniciarProva(idCaderno) {
+      Swal.fire({
+        title: 'Pronto para começar?',
+        text: "O tempo de cada questão não pode ser pausado após o início.",
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: 'var(--primaria)',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sim, Começar!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.showLoading();
+            // Busca os dados completos da prova no servidor
+            fetch(`${URL_API_GOOGLE}?api=obterProvaCompleta&idCaderno=${idCaderno}`)
+              .then(res => res.json())
+              .then(prova => {
+                 Swal.close();
+                 if(!prova.questoes) {
+                     Swal.fire('Erro', 'Prova não encontrada ou sem questões.', 'error'); return;
+                 }
+                 
+                 cadernoAtivo = prova;
+                 
+                 // Se o professor marcou para embaralhar, embaralhamos a cópia local do aluno
+                 if(cadernoAtivo.embaralhar) {
+                     cadernoAtivo.questoes = cadernoAtivo.questoes.sort(() => Math.random() - 0.5);
+                 }
+
+                 respostasAluno = new Array(cadernoAtivo.questoes.length).fill(null);
+                 indiceAtual = 0;
+                 alternarTela('telaExecucaoProva');
+                 renderizarQuestao();
+              });
+        }
+      });
+    }
+
+    // 4. RENDERIZAR QUESTÃO (Motor herdado do simulador)
+    function renderizarQuestao() {
+      if(indiceAtual >= cadernoAtivo.questoes.length) { 
+          finalizarEEnviarProva(); 
+          return; 
+      }
+      
+      const q = cadernoAtivo.questoes[indiceAtual];
+      tempoRestante = parseInt(q.tempo || 60);
+      
+      let numAtual = indiceAtual + 1;
+      let totalQ = cadernoAtivo.questoes.length;
+      let pct = Math.round(((indiceAtual) / totalQ) * 100);
+      
+      document.getElementById('textoProgresso').innerText = 'Questão ' + numAtual + ' de ' + totalQ;
+      document.getElementById('percentualProgresso').innerText = pct + '%';
+      document.getElementById('barraProgresso').style.width = pct + '%';
+      
+      let html = '<div class="p-4">';
+      
+      // Mídia
+      if(q.midia) {
+          if (q.midia.includes('youtube.com') || q.midia.includes('youtu.be')) {
+              let vid = q.midia.includes('v=') ? q.midia.split('v=')[1].split('&')[0] : q.midia.split('youtu.be/')[1].split('?')[0];
+              html += `<div class="text-center mb-4"><iframe width="100%" height="315" src="https://www.youtube.com/embed/${vid}" frameborder="0" allowfullscreen class="rounded border shadow-sm"></iframe></div>`;
+          } else {
+              html += `<div class="text-center mb-4"><img src="${q.midia}" class="img-fluid rounded border shadow-sm" style="max-height: 350px;"></div>`;
+          }
+      }
+
+      if(q.tipo === "estudo_caso") html += '<div class="estudo-caso-box shadow-sm">' + (q.contexto || "").replace(/\n/g, '<br>') + '</div>';
+      
+      if(q.tipo === "lacunas") {
+        let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:40px;" oninput="verificarPreenchimento()">');
+        html += '<p class="fw-bold mb-4 text-dark fs-5">' + enunciadoFmt + '</p>';
+      } else if(q.tipo !== "assercao_razao") {
+        html += '<p class="fw-bold mb-4 text-dark fs-5">' + (q.enunciado || "") + '</p>';
+      }
+
+      // Renderização Específica por Tipo
+      if (q.tipo === "multipla_escolha") {
+        ['A','B','C','D','E'].forEach(l => { 
+            if(q.opcoes && q.opcoes[l]) {
+                html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100 fs-6" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; 
+            }
+        });
+      } else if (q.tipo === "certo_errado") {
+        html += `<div class="d-flex gap-4 mb-3"><div class="form-check p-3 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Certo" id="opt_C" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-success w-100" for="opt_C" style="cursor:pointer;">CERTO</label></div><div class="form-check p-3 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Errado" id="opt_E" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-danger w-100" for="opt_E" style="cursor:pointer;">ERRADO</label></div></div>`;
+      } else if (q.tipo === "assercao_razao") {
+        html += `<div class="bg-light p-4 rounded mb-4 border shadow-sm"><p class="mb-2 fw-bold">I. ${q.assercao}</p><div class="text-danger fw-bold my-3 text-center"><i class="fas fa-link"></i> PORQUE</div><p class="mb-0 fw-bold">II. ${q.razao}</p></div>`;
+        let assOpcoes = [ {v: "I", t: "I. A afirmação I é verdadeira, e a II é verdadeira, e a II justifica a I."}, {v: "II", t: "II. A afirmação I é verdadeira, e a II é verdadeira, mas a II não justifica a I."}, {v: "III", t: "III. A afirmação I é verdadeira, e a II é falsa."}, {v: "IV", t: "IV. A afirmação I é falsa, e a II é verdadeira."}, {v: "V", t: "V. A afirmação I é falsa, e a II é falsa."} ];
+        assOpcoes.forEach(op => {
+            html += `<div class="form-check mb-2 p-2 rounded bg-light border"><input class="form-check-input ms-1 me-2" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`;
+        });
+      } else if (q.tipo === "associacao") {
+        html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`;
+        (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-2 bg-light rounded border shadow-sm"><strong>${idx+1}.</strong> ${item}</div>`; });
+        html += `</div><div class="col-sm-7 ps-4">`;
+        (q.colunaB || []).forEach((item, idx) => { 
+          let dItem = (q.b_is_img && item.startsWith('http')) ? `<img src="${item}" class="rounded border" style="max-height:60px;">` : `<span class="fw-bold">${item}</span>`;
+          html += `<div class="d-flex align-items-center mb-3 bg-white p-2 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:45px; height:45px; font-size:18px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
+        });
+        html += `</div></div>`;
+      } else if (q.tipo === "ordenacao") {
+        q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:55px; height:45px; font-size:18px;" oninput="verificarPreenchimento()"></div></div>`; });
+      } else if (q.tipo === "verdadeiro_falso_mult") {
+        q.lista.forEach(item => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-4 p-0 text-uppercase" style="width:50px; height:45px; font-weight:800;" maxlength="1" oninput="verificarPreenchimento()"><span class="fw-bold text-dark">${item}</span></div>`; });
+      } else if (q.tipo !== "lacunas") {
+        html += `<textarea class="form-control in-teste p-3 shadow-sm" style="border: 2px solid #0284C7; font-weight: 600; background-color: #F0F9FF;" rows="5" placeholder="Digite sua resposta detalhada aqui..." oninput="verificarPreenchimento()"></textarea>`;
+      }
+      
+      document.getElementById('areaQuestaoAtiva').innerHTML = html + '</div>';
+      
+      // Controle de tempo
+      const btn = document.getElementById('btnAvancar');
+      btn.disabled = true;
+      btn.className = "btn btn-secondary w-100 mb-3 shadow-sm";
+      btn.innerHTML = `Aguarde... <span class="badge bg-white text-secondary ms-2">${tempoRestante}s</span>`;
+      
+      clearInterval(timerIntervalo);
+      document.getElementById('relogioTeste').innerHTML = `<i class="fas fa-stopwatch"></i> ${tempoRestante}s`;
+      timerIntervalo = setInterval(tickTempo, 1000);
+    }
+
+    function tickTempo() {
+      tempoRestante--;
+      document.getElementById('relogioTeste').innerHTML = `<i class="fas fa-stopwatch"></i> ${tempoRestante > 0 ? tempoRestante + 's' : '0s'}`;
+      
+      if(tempoRestante > 0) { 
+          document.getElementById('btnAvancar').innerHTML = `Aguarde... <span class="badge bg-white text-secondary ms-2">${tempoRestante}s</span>`; 
+      } else { 
+          clearInterval(timerIntervalo); 
+          verificarPreenchimento(); 
+      }
+    }
+
+    function verificarPreenchimento() {
+      if(tempoRestante > 0) return; 
+      
+      let respondeu = false;
+      const radios = document.querySelectorAll('#areaQuestaoAtiva input[type="radio"]:checked');
+      const inputs = document.querySelectorAll('#areaQuestaoAtiva input[type="text"], #areaQuestaoAtiva textarea');
+      
+      if (radios.length > 0) respondeu = true;
+      if (inputs.length > 0) {
+        let allFilled = true;
+        inputs.forEach(inp => { if(inp.value.trim() === '') allFilled = false; });
+        if(allFilled) respondeu = true; 
+      }
+
+      const btn = document.getElementById('btnAvancar');
+      if(respondeu) {
+        btn.disabled = false;
+        btn.style.backgroundColor = "var(--sucesso)";
+        btn.style.color = "white";
+        btn.innerHTML = (indiceAtual === cadernoAtivo.questoes.length - 1) ? 'Finalizar Prova <i class="fas fa-flag-checkered ms-2"></i>' : 'Confirmar Resposta <i class="fas fa-arrow-right ms-2"></i>';
+      } else {
+        btn.disabled = true;
+        btn.style.backgroundColor = "#6c757d";
+        btn.innerHTML = '<i class="fas fa-pen me-2"></i> Responda para avançar';
+      }
+    }
+
+    function avancarQuestao() {
+      const q = cadernoAtivo.questoes[indiceAtual];
+      if(["multipla_escolha", "certo_errado", "assercao_razao"].includes(q.tipo)) {
+        const rad = document.querySelector('input[name="respProva"]:checked');
+        respostasAluno[indiceAtual] = rad ? rad.value : "";
+      } else {
+        const inputs = document.querySelectorAll('.in-teste');
+        let vals = []; inputs.forEach(i => vals.push(i.value.trim().toUpperCase()));
+        respostasAluno[indiceAtual] = vals.join(", ");
+      }
+      
+      indiceAtual++; 
+      renderizarQuestao();
+    }
+
+    // 5. ENVIAR PARA O SERVIDOR E CALCULAR NOTA FINAL
+    function finalizarEEnviarProva() {
+      Swal.fire({
+          title: 'Finalizando...',
+          text: 'Enviando suas respostas para o professor.',
+          allowOutsideClick: false,
+          didOpen: () => { Swal.showLoading(); }
+      });
+
+      // Aqui executamos o mesmo cálculo que havia no simulador (mas agora será enviado para o professor)
+      let somaAcertos = 0; 
+      let totalQuestoes = cadernoAtivo.questoes.length;
+      let notaPontos = 0;
+
+      cadernoAtivo.questoes.forEach((q, i) => {
+        let respAluno = respostasAluno[i] || "";
+        let ptsQuestao = parseFloat(q.pontos) || 0;
+        let acertoFracao = 0;
+
+        if(["dissertativa", "estudo_caso", "resposta_curta"].includes(q.tipo)) {
+          let gruposChaves = (q.criterios || q.resposta || "").split(/[,;]+/).map(g => g.trim().toLowerCase()).filter(g => g.length > 0);
+          let respAlunoMin = respAluno.toLowerCase();
+          let encontradas = 0;
+          gruposChaves.forEach(grupo => {
+            if(grupo.split('/').some(s => respAlunoMin.includes(s.trim()))) encontradas++;
+          });
+          let pctItem = gruposChaves.length > 0 ? (encontradas / gruposChaves.length) : 0;
+          if (pctItem >= 0.8) acertoFracao = 1; else if (pctItem >= 0.5) acertoFracao = 0.75; else if (pctItem >= 0.25) acertoFracao = 0.40;
+        } else {
+          let respEsp = q.resposta || "";
+          if(q.tipo === 'assercao_razao') {
+             let mapR = {"A":"I", "B":"II", "C":"III", "D":"IV", "E":"V"};
+             if(mapR[respEsp]) respEsp = mapR[respEsp];
+          }
+          if(respAluno.replace(/\s/g, '').toLowerCase() === respEsp.replace(/\s/g, '').toLowerCase()) acertoFracao = 1;
+        }
+        somaAcertos += acertoFracao;
+        notaPontos += (acertoFracao * ptsQuestao);
+      });
+
+      let pctFinal = totalQuestoes > 0 ? Math.round((somaAcertos / totalQuestoes) * 100) : 0;
+      let notaString = pctFinal + "% (" + notaPontos + " pts)";
+
+      // Envia os dados para a API salvar no banco de histórico
+      let pacoteEnvio = {
+          api: 'salvarRespostaAluno',
+          matricula: dadosAluno.matricula,
+          idCaderno: cadernoAtivo.idCaderno,
+          respostas: respostasAluno,
+          nota: notaString
+      };
+
+      fetch(URL_API_GOOGLE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(pacoteEnvio)
+      })
+      .then(res => res.json())
+      .then(resp => {
+         Swal.fire({
+            title: 'Parabéns!',
+            text: 'Sua atividade foi concluída e enviada com sucesso.',
+            icon: 'success',
+            confirmButtonText: 'Voltar ao Início',
+            confirmButtonColor: 'var(--primaria)'
+         }).then(() => {
+             alternarTela('telaDashboard');
+             carregarAtividadesPendentes(); // Recarrega a lista para sumir a prova feita
+         });
+      })
+      .catch(err => {
+         Swal.fire('Erro', 'Ocorreu um erro ao salvar sua prova. Tire um print da tela e avise seu professor.', 'error');
+      });
+    }
+
+  </script>
+</body>
+</html>
