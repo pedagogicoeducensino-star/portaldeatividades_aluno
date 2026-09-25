@@ -12,10 +12,12 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <style>
+    /* PALETA TERROSA E QUENTE APLICADA AO ALUNO */
     :root { 
-      --primaria: #0284C7; /* Azul para diferenciar da área do professor */
-      --primaria-hover: #0369A1;
-      --secundaria: #38BDF8; 
+      --primaria: #F97316; 
+      --primaria-hover: #EA580C;
+      --secundaria: #F59E0B; 
+      --marrom-suave: #78350F;
       --cinza-fundo: #F8FAFC;
       --cinza-card: #FFFFFF;
       --cinza-texto: #334155;
@@ -28,20 +30,21 @@
     
     .card-3d { background: var(--cinza-card); border-radius: 16px; padding: 28px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03); border: 1px solid var(--cinza-borda); border-top: 5px solid var(--primaria); margin-bottom: 24px; }
     
-    .btn-primario { background-color: var(--primaria); color: white; border: none; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2); font-weight: 600; padding: 12px 20px; border-radius: 8px; transition: all 0.2s;}
+    .btn-primario { background-color: var(--primaria); color: white; border: none; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.2); font-weight: 600; padding: 12px 20px; border-radius: 8px; transition: all 0.2s;}
     .btn-primario:hover { background-color: var(--primaria-hover); color: white; transform: translateY(-2px); }
     
     .escondido { display: none !important; }
     
-    /* Estilos do Teste (Herdados do Simulador) */
-    .relogio-teste { font-size: 26px !important; font-weight: 800; color: white; background: var(--primaria-hover); padding: 12px 40px; border-radius: 50px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.1); letter-spacing: 1px;}
+    /* Estilos do Teste e Cronômetro */
+    .relogio-teste { font-size: 26px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 12px 40px; border-radius: 50px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.1); letter-spacing: 1px;}
     .progress { background-color: #F1F5F9; border: 1px solid var(--cinza-borda); }
     .progress-bar { background: linear-gradient(90deg, var(--secundaria), var(--primaria)); transition: width 0.5s ease; }
     
-    .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--primaria-hover); transition: all 0.2s; border-radius: 8px;}
-    .input-box-destaque:focus { outline: none; border-color: var(--primaria); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); background-color: white;}
+    /* Inputs focados e Caixas Especiais */
+    .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--marrom-suave); transition: all 0.2s; border-radius: 8px;}
+    .input-box-destaque:focus { outline: none; border-color: var(--primaria); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15); background-color: white;}
     
-    .estudo-caso-box { background-color: #F0F9FF; border-left: 4px solid var(--primaria); padding: 18px; border-radius: 8px; margin-bottom: 18px; font-style: italic; color: #0C4A6E; }
+    .estudo-caso-box { background-color: #FFFBEB; border-left: 4px solid var(--secundaria); padding: 18px; border-radius: 8px; margin-bottom: 18px; font-style: italic; color: var(--marrom-suave); }
   </style>
 </head>
 <body>
@@ -50,7 +53,7 @@
   <div id="telaLogin" class="card-3d mx-auto shadow-sm" style="max-width: 400px; margin-top: 15vh;">
     <div class="text-center mb-4">
       <div class="mb-3"><i class="fas fa-user-graduate" style="font-size: 50px; color: var(--primaria);"></i></div>
-      <h2 class="fw-bold mb-1" style="color: var(--primaria-hover);">Portal do Aluno</h2>
+      <h2 class="fw-bold mb-1" style="color: var(--marrom-suave);">Portal do Aluno</h2>
       <p class="text-muted small">Acesse suas atividades pendentes</p>
     </div>
     <div class="mb-4">
@@ -67,17 +70,17 @@
   <div id="telaDashboard" class="container py-4 escondido" style="max-width: 900px;">
     <div class="d-flex justify-content-between align-items-center mb-4 card-3d py-3 shadow-sm" style="border-top-color: var(--secundaria);">
       <div class="d-flex align-items-center gap-3">
-        <div class="bg-light p-3 rounded-circle text-center" style="width: 50px; height: 50px; line-height: 20px;"><i class="fas fa-user text-primary"></i></div>
+        <div class="bg-light p-3 rounded-circle text-center" style="width: 50px; height: 50px; line-height: 20px;"><i class="fas fa-user text-primary" style="color: var(--primaria) !important;"></i></div>
         <div>
           <h2 class="mb-0 fs-4 fw-bold text-dark">Minhas Atividades</h2>
-          <span class="text-muted small">Aluno: <strong id="nomeAlunoDisplay" class="text-dark"></strong></span>
+          <span class="text-muted small">Aluno: <strong id="nomeAlunoDisplay" style="color: var(--marrom-suave);"></strong></span>
         </div>
       </div>
       <button class="btn btn-sm btn-outline-danger fw-bold" onclick="sair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
     </div>
 
     <div class="card-3d" style="border-top: none;">
-      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-tasks text-primary me-2"></i> Avaliações Pendentes</h5>
+      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-tasks me-2" style="color: var(--primaria);"></i> Avaliações Pendentes</h5>
       <div id="listaAtividades" class="row g-3">
         <!-- Cards de provas serão injetados aqui -->
       </div>
@@ -98,7 +101,7 @@
       </div>
     </div>
 
-    <div id="areaQuestaoAtiva" class="card-3d shadow-sm mb-4" style="border-top-width: 6px; min-height: 250px;">
+    <div id="areaQuestaoAtiva" class="card-3d shadow-sm mb-4" style="border-top-width: 6px; border-top-color: var(--secundaria); min-height: 250px;">
       <!-- Questão será renderizada aqui -->
     </div>
 
@@ -111,7 +114,7 @@
 
   <script>
     // =========================================================================
-    // COLE AQUI A MESMA URL DO GOOGLE APPS SCRIPT USADA NO PORTAL DO PROFESSOR
+    // COLE AQUI A NOVA URL DE IMPLANTAÇÃO DO SEU GOOGLE APPS SCRIPT
     // =========================================================================
     const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzEjn_R54vUXpglydH_z669p53Smxw84wt7gm9KPdQSlp5rMHovbxb7-pq7MSWv6Mfd/exec";
     
@@ -133,7 +136,7 @@
       alternarTela('telaLogin');
     }
 
-    // 1. LOGIN DO ALUNO
+    // LOGIN DO ALUNO
     function fazerLoginAluno() {
       const matricula = document.getElementById('inputMatricula').value.trim();
       if(!matricula) {
@@ -145,7 +148,6 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
       btn.disabled = true;
 
-      // Chama a API passando a matrícula
       fetch(`${URL_API_GOOGLE}?api=loginAluno&matricula=${matricula}`)
         .then(res => res.json())
         .then(resp => {
@@ -168,7 +170,7 @@
         });
     }
 
-    // 2. CARREGAR ATIVIDADES DO ALUNO
+    // CARREGAR ATIVIDADES DO ALUNO
     function carregarAtividadesPendentes() {
       const lista = document.getElementById('listaAtividades');
       lista.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="fas fa-spinner fa-spin fs-3"></i><br>Buscando suas provas...</div>';
@@ -184,7 +186,6 @@
           }
 
           atividades.forEach(ativ => {
-            // Se já concluiu, não mostra ou mostra bloqueado (depende da sua regra de negócio)
             if(ativ.status === 'Concluído') return; 
 
             lista.innerHTML += `
@@ -209,7 +210,7 @@
         });
     }
 
-    // 3. INICIAR A PROVA
+    // INICIAR A PROVA
     function iniciarProva(idCaderno) {
       Swal.fire({
         title: 'Pronto para começar?',
@@ -222,7 +223,6 @@
       }).then((result) => {
         if (result.isConfirmed) {
             Swal.showLoading();
-            // Busca os dados completos da prova no servidor
             fetch(`${URL_API_GOOGLE}?api=obterProvaCompleta&idCaderno=${idCaderno}`)
               .then(res => res.json())
               .then(prova => {
@@ -233,7 +233,6 @@
                  
                  cadernoAtivo = prova;
                  
-                 // Se o professor marcou para embaralhar, embaralhamos a cópia local do aluno
                  if(cadernoAtivo.embaralhar) {
                      cadernoAtivo.questoes = cadernoAtivo.questoes.sort(() => Math.random() - 0.5);
                  }
@@ -247,7 +246,7 @@
       });
     }
 
-    // 4. RENDERIZAR QUESTÃO (Motor herdado do simulador)
+    // RENDERIZAR QUESTÃO
     function renderizarQuestao() {
       if(indiceAtual >= cadernoAtivo.questoes.length) { 
           finalizarEEnviarProva(); 
@@ -267,7 +266,6 @@
       
       let html = '<div class="p-4">';
       
-      // Mídia
       if(q.midia) {
           if (q.midia.includes('youtube.com') || q.midia.includes('youtu.be')) {
               let vid = q.midia.includes('v=') ? q.midia.split('v=')[1].split('&')[0] : q.midia.split('youtu.be/')[1].split('?')[0];
@@ -286,7 +284,6 @@
         html += '<p class="fw-bold mb-4 text-dark fs-5">' + (q.enunciado || "") + '</p>';
       }
 
-      // Renderização Específica por Tipo
       if (q.tipo === "multipla_escolha") {
         ['A','B','C','D','E'].forEach(l => { 
             if(q.opcoes && q.opcoes[l]) {
@@ -315,12 +312,11 @@
       } else if (q.tipo === "verdadeiro_falso_mult") {
         q.lista.forEach(item => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-4 p-0 text-uppercase" style="width:50px; height:45px; font-weight:800;" maxlength="1" oninput="verificarPreenchimento()"><span class="fw-bold text-dark">${item}</span></div>`; });
       } else if (q.tipo !== "lacunas") {
-        html += `<textarea class="form-control in-teste p-3 shadow-sm" style="border: 2px solid #0284C7; font-weight: 600; background-color: #F0F9FF;" rows="5" placeholder="Digite sua resposta detalhada aqui..." oninput="verificarPreenchimento()"></textarea>`;
+        html += `<textarea class="form-control in-teste p-3 shadow-sm" style="border: 2px solid var(--primaria); font-weight: 600; background-color: #FFFBEB;" rows="5" placeholder="Digite sua resposta detalhada aqui..." oninput="verificarPreenchimento()"></textarea>`;
       }
       
       document.getElementById('areaQuestaoAtiva').innerHTML = html + '</div>';
       
-      // Controle de tempo
       const btn = document.getElementById('btnAvancar');
       btn.disabled = true;
       btn.className = "btn btn-secondary w-100 mb-3 shadow-sm";
@@ -385,7 +381,7 @@
       renderizarQuestao();
     }
 
-    // 5. ENVIAR PARA O SERVIDOR E CALCULAR NOTA FINAL
+    // ENVIAR PARA O SERVIDOR
     function finalizarEEnviarProva() {
       Swal.fire({
           title: 'Finalizando...',
@@ -394,7 +390,6 @@
           didOpen: () => { Swal.showLoading(); }
       });
 
-      // Aqui executamos o mesmo cálculo que havia no simulador (mas agora será enviado para o professor)
       let somaAcertos = 0; 
       let totalQuestoes = cadernoAtivo.questoes.length;
       let notaPontos = 0;
@@ -428,7 +423,6 @@
       let pctFinal = totalQuestoes > 0 ? Math.round((somaAcertos / totalQuestoes) * 100) : 0;
       let notaString = pctFinal + "% (" + notaPontos + " pts)";
 
-      // Envia os dados para a API salvar no banco de histórico
       let pacoteEnvio = {
           api: 'salvarRespostaAluno',
           matricula: dadosAluno.matricula,
@@ -452,14 +446,13 @@
             confirmButtonColor: 'var(--primaria)'
          }).then(() => {
              alternarTela('telaDashboard');
-             carregarAtividadesPendentes(); // Recarrega a lista para sumir a prova feita
+             carregarAtividadesPendentes(); 
          });
       })
       .catch(err => {
          Swal.fire('Erro', 'Ocorreu um erro ao salvar sua prova. Tire um print da tela e avise seu professor.', 'error');
       });
     }
-
   </script>
 </body>
 </html>
