@@ -12,7 +12,6 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <style>
-    /* PALETA OFICIAL (Laranja, Dourado, Marrom, Creme e Cinza Claro) */
     :root { 
       --primaria: #F97316; 
       --primaria-hover: #EA580C;
@@ -36,12 +35,10 @@
     
     .escondido { display: none !important; }
     
-    /* Estilos do Teste e Cronômetro */
     .relogio-teste { font-size: 26px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 12px 40px; border-radius: 50px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.1); letter-spacing: 1px;}
     .progress { background-color: #F1F5F9; border: 1px solid var(--cinza-borda); }
     .progress-bar { background: linear-gradient(90deg, var(--secundaria), var(--primaria)); transition: width 0.5s ease; }
     
-    /* Inputs focados e Caixas Especiais */
     .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--marrom-suave); transition: all 0.2s; border-radius: 8px;}
     .input-box-destaque:focus { outline: none; border-color: var(--primaria); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15); background-color: white;}
     
@@ -68,24 +65,40 @@
   </div>
 
   <!-- TELA DASHBOARD (ATIVIDADES) -->
-  <div id="telaDashboard" class="container py-4 escondido" style="max-width: 900px;">
-    <div class="d-flex justify-content-between align-items-center mb-4 card-3d py-3 shadow-sm" style="border-top-color: var(--secundaria);">
+  <div id="telaDashboard" class="container py-4 escondido" style="max-width: 950px;">
+    
+    <!-- Cabeçalho e Saudação -->
+    <div class="d-flex justify-content-between align-items-center mb-4 card-3d py-4 shadow-sm" style="border-top-color: var(--secundaria); background: linear-gradient(to right, #ffffff, #FFFBEB);">
       <div class="d-flex align-items-center gap-3">
-        <div class="bg-light p-3 rounded-circle text-center" style="width: 50px; height: 50px; line-height: 20px;"><i class="fas fa-user text-primary" style="color: var(--primaria) !important;"></i></div>
+        <div class="bg-white shadow-sm p-3 rounded-circle text-center border" style="width: 60px; height: 60px; line-height: 25px;">
+            <i class="fas fa-user-graduate fs-4" style="color: var(--primaria);"></i>
+        </div>
         <div>
-          <h2 class="mb-0 fs-4 fw-bold text-dark">Minhas Atividades</h2>
-          <span class="text-muted small">Aluno: <strong id="nomeAlunoDisplay" style="color: var(--marrom-suave);"></strong></span>
+          <h3 class="mb-1 fw-bold text-dark" id="textoSaudacao">Olá!</h3>
+          <span class="text-muted small">Seja bem-vindo(a) ao seu painel de estudos.</span>
         </div>
       </div>
-      <button class="btn btn-sm btn-outline-danger fw-bold" onclick="sair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+      <button class="btn btn-sm btn-outline-danger fw-bold shadow-sm" onclick="sair()"><i class="fas fa-sign-out-alt"></i> Sair</button>
     </div>
 
-    <div class="card-3d" style="border-top: none;">
-      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-tasks me-2" style="color: var(--primaria);"></i> Avaliações Pendentes</h5>
-      <div id="listaAtividades" class="row g-3">
-        <!-- Cards de provas serão injetados aqui -->
-      </div>
+    <!-- SESSÃO 1: EM ANDAMENTO -->
+    <div class="card-3d mb-4" style="border-top: none;" id="sessaoEmAndamento">
+      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-play-circle me-2" style="color: var(--secundaria);"></i> Continue de onde parou</h5>
+      <div id="listaEmAndamento" class="row g-3"></div>
     </div>
+
+    <!-- SESSÃO 2: PENDENTES (A FAZER) -->
+    <div class="card-3d mb-4" style="border-top: none;" id="sessaoPendentes">
+      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-tasks me-2" style="color: var(--primaria);"></i> Avaliações Pendentes</h5>
+      <div id="listaPendentes" class="row g-3"></div>
+    </div>
+
+    <!-- SESSÃO 3: CONCLUÍDAS (BOLETIM) -->
+    <div class="card-3d" style="border-top: none; background-color: #F8FAFC;" id="sessaoConcluidas">
+      <h5 class="mb-4 text-dark fw-bold"><i class="fas fa-check-circle me-2" style="color: var(--sucesso);"></i> Meu Boletim (Concluídas)</h5>
+      <div id="listaConcluidas" class="row g-3"></div>
+    </div>
+    
   </div>
 
   <!-- TELA DE EXECUÇÃO DA PROVA -->
@@ -127,6 +140,17 @@
     let tempoRestante = 0;
     let timerIntervalo = null;
 
+    // VERIFICA SE O ALUNO JÁ ESTÁ LOGADO AO ABRIR A PÁGINA (Anti-Refresh)
+    window.onload = function() {
+      const sessaoSalva = localStorage.getItem('alunoLogado_LMS');
+      if (sessaoSalva) {
+         dadosAluno = JSON.parse(sessaoSalva);
+         montarSaudacao(dadosAluno.nome);
+         alternarTela('telaDashboard');
+         carregarAtividadesPendentes();
+      }
+    };
+
     function alternarTela(idTela) {
       document.querySelectorAll('.container, #telaLogin').forEach(el => el.classList.add('escondido'));
       document.getElementById(idTela).classList.remove('escondido');
@@ -134,17 +158,25 @@
 
     function sair() {
       dadosAluno = null;
+      localStorage.removeItem('alunoLogado_LMS'); // Limpa a memória
       document.getElementById('inputMatricula').value = "";
       alternarTela('telaLogin');
     }
 
-    // 1. LOGIN UTILIZANDO A ROTA DO SEU GS (api=loginAluno)
+    // SAUDAÇÃO INTELIGENTE POR HORA DO DIA
+    function montarSaudacao(nome) {
+      const hora = new Date().getHours();
+      let cumprimento = "Boa noite";
+      if (hora >= 5 && hora < 12) cumprimento = "Bom dia";
+      else if (hora >= 12 && hora < 18) cumprimento = "Boa tarde";
+      
+      document.getElementById('textoSaudacao').innerHTML = `${cumprimento}, <strong style="color: var(--primaria);">${nome}</strong>! 📚`;
+    }
+
+    // LOGIN
     function fazerLoginAluno() {
       const matricula = document.getElementById('inputMatricula').value.trim();
-      if(!matricula) {
-        Swal.fire('Atenção', 'Digite sua matrícula para entrar.', 'warning');
-        return;
-      }
+      if(!matricula) { Swal.fire('Atenção', 'Digite sua matrícula para entrar.', 'warning'); return; }
 
       const btn = document.getElementById('btnLogin');
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
@@ -158,7 +190,9 @@
 
           if(resp.sucesso) {
             dadosAluno = { matricula: matricula, nome: resp.nome };
-            document.getElementById('nomeAlunoDisplay').innerText = resp.nome;
+            localStorage.setItem('alunoLogado_LMS', JSON.stringify(dadosAluno)); // Salva na memória do navegador
+            
+            montarSaudacao(resp.nome);
             alternarTela('telaDashboard');
             carregarAtividadesPendentes();
           } else {
@@ -172,54 +206,113 @@
         });
     }
 
-    // 2. BUSCAR PAINEL UTILIZANDO A ROTA DO SEU GS (api=painelAluno)
+    // BUSCAR PAINEL (Separando em 3 blocos)
     function carregarAtividadesPendentes() {
-      const lista = document.getElementById('listaAtividades');
-      lista.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="fas fa-spinner fa-spin fs-3"></i><br>Buscando suas provas...</div>';
+      const containerEmAndamento = document.getElementById('listaEmAndamento');
+      const containerPendentes = document.getElementById('listaPendentes');
+      const containerConcluidas = document.getElementById('listaConcluidas');
+      
+      containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted"><i class="fas fa-spinner fa-spin mb-2"></i> Buscando...</div>';
+      containerPendentes.innerHTML = '';
+      containerConcluidas.innerHTML = '';
 
       fetch(`${URL_API_GOOGLE}?api=painelAluno&matricula=${dadosAluno.matricula}`)
         .then(res => res.json())
         .then(painel => {
           painelCompleto = painel;
-          lista.innerHTML = "";
           
-          // Junta as provas 'a_fazer' e 'em_andamento' do seu GS
-          let pendentes = [...painel.a_fazer, ...painel.em_andamento];
-          
-          if(pendentes.length === 0) {
-            lista.innerHTML = '<div class="col-12 text-center text-muted py-5 bg-light rounded border"><i class="fas fa-mug-hot fs-1 mb-3 text-secondary"></i><br><h5 class="fw-bold">Tudo em dia!</h5>Nenhuma atividade pendente para você no momento.</div>';
-            return;
+          containerEmAndamento.innerHTML = '';
+          containerPendentes.innerHTML = '';
+          containerConcluidas.innerHTML = '';
+
+          // 1. EM ANDAMENTO
+          if(painel.em_andamento && painel.em_andamento.length > 0) {
+            document.getElementById('sessaoEmAndamento').classList.remove('escondido');
+            painel.em_andamento.forEach(ativ => {
+              containerEmAndamento.innerHTML += gerarCardHTML(ativ, 'andamento');
+            });
+          } else {
+            document.getElementById('sessaoEmAndamento').classList.add('escondido');
           }
 
-          pendentes.forEach(ativ => {
-            let labelStatus = ativ.status === 'Em Andamento' 
-              ? '<span class="badge bg-warning text-dark"><i class="fas fa-play"></i> Em Andamento</span>' 
-              : '<span class="badge bg-primary"><i class="fas fa-clock"></i> Pendente</span>';
-              
-            lista.innerHTML += `
-              <div class="col-md-6">
-                <div class="p-4 bg-white border rounded shadow-sm hover-shadow transition d-flex flex-column h-100" style="border-left: 4px solid var(--primaria);">
-                  <div class="d-flex justify-content-between mb-2">
-                      <h5 class="fw-bold text-dark mb-0">${ativ.titulo}</h5>
-                      ${labelStatus}
-                  </div>
-                  <div class="mb-3 small text-muted mt-2">
-                    <i class="far fa-clock"></i> Prazo: ${ativ.prazo} <br>
-                    <i class="fas fa-list-ol"></i> Questões: ${ativ.questoesOriginal ? ativ.questoesOriginal.length : 0}
-                  </div>
-                  <div class="mt-auto">
-                    <button class="btn btn-primario w-100 fw-bold" onclick="iniciarProva(${ativ.linhaPlanilha})"><i class="fas fa-pen me-2"></i> Iniciar Agora</button>
-                  </div>
-                </div>
-              </div>
-            `;
-          });
+          // 2. PENDENTES (A FAZER)
+          if(painel.a_fazer && painel.a_fazer.length > 0) {
+             document.getElementById('sessaoPendentes').classList.remove('escondido');
+             painel.a_fazer.forEach(ativ => {
+               containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer');
+             });
+          } else {
+             containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4"><i class="fas fa-mug-hot fs-2 mb-2 text-secondary"></i><br>Nenhuma avaliação pendente.</div>';
+          }
+
+          // 3. CONCLUÍDAS (BOLETIM)
+          if(painel.concluidas && painel.concluidas.length > 0) {
+             document.getElementById('sessaoConcluidas').classList.remove('escondido');
+             painel.concluidas.forEach(ativ => {
+               containerConcluidas.innerHTML += gerarCardHTML(ativ, 'concluida');
+             });
+          } else {
+             document.getElementById('sessaoConcluidas').classList.add('escondido');
+          }
         });
     }
 
-    // 3. INICIAR A PROVA
+    // Função auxiliar para desenhar o HTML dos Cards
+    function gerarCardHTML(ativ, tipo) {
+      let qtdQ = ativ.questoesOriginal ? ativ.questoesOriginal.length : 0;
+      let prazoTxt = ativ.prazo ? ativ.prazo : 'Sem prazo';
+      
+      if(tipo === 'andamento') {
+         return `
+          <div class="col-md-6">
+            <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 4px solid var(--secundaria);">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="fw-bold text-dark mb-0">${ativ.titulo}</h5>
+              </div>
+              <div class="mb-4 small text-muted mt-2">
+                <i class="far fa-clock"></i> Prazo: ${prazoTxt} <br>
+                <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
+              </div>
+              <button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave);" onclick="iniciarProva(${ativ.linhaPlanilha})">
+                 <i class="fas fa-play me-2"></i> Continuar Prova
+              </button>
+            </div>
+          </div>`;
+      } 
+      else if(tipo === 'fazer') {
+         return `
+          <div class="col-md-6">
+            <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 4px solid var(--primaria);">
+              <h5 class="fw-bold text-dark mb-2">${ativ.titulo}</h5>
+              <div class="mb-4 small text-muted">
+                <i class="far fa-clock"></i> Prazo: ${prazoTxt} <br>
+                <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
+              </div>
+              <button class="btn btn-primario w-100 fw-bold mt-auto" onclick="iniciarProva(${ativ.linhaPlanilha})">
+                 <i class="fas fa-pen me-2"></i> Iniciar Agora
+              </button>
+            </div>
+          </div>`;
+      } 
+      else if(tipo === 'concluida') {
+         return `
+          <div class="col-md-6">
+            <div class="p-4 bg-white border rounded shadow-sm h-100" style="border-left: 4px solid var(--sucesso); opacity: 0.9;">
+              <h5 class="fw-bold text-dark mb-2">${ativ.titulo}</h5>
+              <div class="mb-3 small text-muted">
+                <i class="fas fa-calendar-check"></i> Finalizada <br>
+                <i class="fas fa-list-ol"></i> Questões: ${qtdQ}
+              </div>
+              <div class="p-2 text-center rounded fw-bold fs-5 mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">
+                 Nota: ${ativ.nota || 'Aguardando'}
+              </div>
+            </div>
+          </div>`;
+      }
+    }
+
+    // INICIAR A PROVA
     function iniciarProva(linhaPlanilha) {
-      // Procura a atividade selecionada dentro do que o GS enviou
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
       cadernoAtivo = pendentes.find(p => p.linhaPlanilha === linhaPlanilha);
       
@@ -238,7 +331,6 @@
         confirmButtonText: 'Sim, Começar!'
       }).then((result) => {
         if (result.isConfirmed) {
-            // Embaralha se o professor configurou
             if(cadernoAtivo.embaralhar) {
                 cadernoAtivo.questoesOriginal = cadernoAtivo.questoesOriginal.sort(() => Math.random() - 0.5);
             }
@@ -250,7 +342,7 @@
       });
     }
 
-    // 4. RENDERIZAR A QUESTÃO NA TELA
+    // RENDERIZAR A QUESTÃO NA TELA
     function renderizarQuestao() {
       if(indiceAtual >= cadernoAtivo.questoesOriginal.length) { 
           finalizarEEnviarProva(); 
@@ -385,7 +477,7 @@
       renderizarQuestao();
     }
 
-    // 5. ENVIAR PARA O SEU GS (api=finalizarAtividade)
+    // ENVIAR PARA O SEU GS
     function finalizarEEnviarProva() {
       Swal.fire({
           title: 'Finalizando...',
@@ -427,13 +519,12 @@
       let pctFinal = totalQuestoes > 0 ? Math.round((somaAcertos / totalQuestoes) * 100) : 0;
       let notaString = pctFinal + "% (" + notaPontos + " pts)";
 
-      // Usando exatamente os dados que o seu doPost(finalizarAtividade) espera
       let pacoteEnvio = {
           api: 'finalizarAtividade',
           linhaPlanilha: cadernoAtivo.linhaPlanilha,
           respostas: respostasAluno,
           notaFinal: notaString,
-          tempoRestante: 0 // Zera o tempo pois terminou
+          tempoRestante: 0 
       };
 
       fetch(URL_API_GOOGLE, {
@@ -452,7 +543,7 @@
                 confirmButtonColor: 'var(--primaria)'
              }).then(() => {
                  alternarTela('telaDashboard');
-                 carregarAtividadesPendentes(); // Recarrega a tela, a prova já vai constar como 'Concluído' e sumir daqui
+                 carregarAtividadesPendentes(); 
              });
          } else {
              Swal.fire('Ops', resp.erro || 'Erro ao processar', 'error');
