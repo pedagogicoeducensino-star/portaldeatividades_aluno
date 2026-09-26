@@ -614,10 +614,11 @@
       let valorPorQuestao = 10 / totalQuestoes;
       let notaFinalCalculada = somaAcertos * valorPorQuestao;
       
-      // Formata a nota para ficar bonitinha (Ex: tira o .0 se for número quebrado, ex: 10.0 vira 10)
+// Formata a nota para ficar bonitinha (Ex: tira o .0 se for número quebrado, ex: 10.0 vira 10)
       let notaFormatada = notaFinalCalculada.toFixed(1).replace('.0', '');
-      let notaString = "Nota: " + notaFormatada + " / 10 Pontos";
-
+      // Manda a Nota e os Acertos separados por "|" para a coordenação ler
+      let notaString = notaFormatada + "|" + somaAcertos + "/" + totalQuestoes;
+      
       let pacoteEnvio = { 
           api: 'finalizarAtividade', 
           linhaPlanilha: cadernoAtivo.linhaPlanilha, 
