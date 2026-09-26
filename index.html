@@ -23,7 +23,7 @@
       --cinza-borda: #E2E8F0;
       --sucesso: #10B981;
       --perigo: #EF4444;
-      --fonte-padrao: 16px; /* Fonte normalizada */
+      --fonte-padrao: 16px; 
     }
     
     body { background-color: var(--cinza-fundo); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--cinza-texto); font-size: var(--fonte-padrao); line-height: 1.6; }
@@ -89,26 +89,31 @@
       <div id="listaEmAndamento" class="row g-4"></div>
     </div>
 
-    <!-- SESSÃO 2: PENDENTES (A FAZER) -->
+    <!-- SESSÃO 2: PENDENTES (A FAZER / LIBERADAS) -->
     <div class="card-3d mb-4" style="border-top: none;" id="sessaoPendentes">
       <h4 class="mb-4 fw-bold" style="color: var(--marrom-suave);"><i class="fas fa-clipboard-list me-2" style="color: var(--primaria);"></i> Novas Atividades Pendentes</h4>
       <div id="listaPendentes" class="row g-4"></div>
     </div>
 
-    <!-- SESSÃO 3: CONCLUÍDAS (BOLETIM) -->
+    <!-- SESSÃO 3: BLOQUEADAS (NOVIDADE) -->
+    <div class="card-3d mb-4" style="border-top: none; background-color: #F8FAFC;" id="sessaoBloqueadas">
+      <h4 class="mb-4 fw-bold text-muted"><i class="fas fa-lock me-2"></i> Próximas Missões (Bloqueadas)</h4>
+      <div id="listaBloqueadas" class="row g-4"></div>
+    </div>
+
+    <!-- SESSÃO 4: CONCLUÍDAS (BOLETIM) -->
     <div class="card-3d" style="border-top: none; background-color: #F8FAFC;" id="sessaoConcluidas">
       <h4 class="mb-4 fw-bold text-dark"><i class="fas fa-award me-2" style="color: var(--sucesso);"></i> Meu Boletim Escolar</h4>
       <div id="listaConcluidas" class="row g-4"></div>
     </div>
   </div>
 
-  <!-- TELA DE INSTRUÇÕES (PRÉ-PROVA) - TOTALMENTE LIMPA E SEM REDUNDÂNCIA -->
+  <!-- TELA DE INSTRUÇÕES (PRÉ-PROVA) -->
   <div id="telaInstrucoes" class="container py-5 escondido" style="max-width: 850px;">
     <div class="card-3d card-topo-laranja text-center p-5">
        <i class="fas fa-bullhorn mb-3" style="font-size: 50px; color: var(--secundaria);"></i>
        <h2 class="fw-bold mb-4 text-dark" id="infoTituloProva">Título da Prova</h2>
        
-       <!-- ÁREA ÚNICA DE INSTRUÇÕES (Texto Oficial) -->
        <div class="text-start mb-4 p-4 rounded shadow-sm" style="background-color: #FFFBEB; border: 1px solid var(--secundaria);">
            <h5 class="fw-bold text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i> ATENÇÃO!</h5>
            <p class="fw-bold text-dark mb-4">Antes de iniciar, leia as orientações:</p>
@@ -279,6 +284,7 @@
       const containerEmAndamento = document.getElementById('listaEmAndamento');
       const containerPendentes = document.getElementById('listaPendentes');
       const containerConcluidas = document.getElementById('listaConcluidas');
+      const containerBloqueadas = document.getElementById('listaBloqueadas');
       
       containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted"><i class="fas fa-spinner fa-spin fs-2"></i></div>';
       
@@ -287,7 +293,8 @@
         .then(painel => {
           painelCompleto = painel;
           
-          containerEmAndamento.innerHTML = ''; containerPendentes.innerHTML = ''; containerConcluidas.innerHTML = '';
+          containerEmAndamento.innerHTML = ''; containerPendentes.innerHTML = ''; 
+          containerConcluidas.innerHTML = ''; containerBloqueadas.innerHTML = '';
 
           document.getElementById('sessaoEmAndamento').classList.remove('escondido');
           if(painel.em_andamento && painel.em_andamento.length > 0) {
@@ -297,7 +304,13 @@
           document.getElementById('sessaoPendentes').classList.remove('escondido');
           if(painel.a_fazer && painel.a_fazer.length > 0) {
              painel.a_fazer.forEach(ativ => containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer'));
-          } else { containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pendente. Tudo em dia!</div>'; }
+          } else { containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pendente no momento!</div>'; }
+
+          // NOVA SESSÃO DE BLOQUEADAS
+          document.getElementById('sessaoBloqueadas').classList.remove('escondido');
+          if(painel.bloqueadas && painel.bloqueadas.length > 0) {
+             painel.bloqueadas.forEach(ativ => containerBloqueadas.innerHTML += gerarCardHTML(ativ, 'bloqueada'));
+          } else { containerBloqueadas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-lock-open fs-3 mb-2 opacity-50"></i><br>Nenhuma missão bloqueada.</div>'; }
 
           document.getElementById('sessaoConcluidas').classList.remove('escondido');
           if(painel.concluidas && painel.concluidas.length > 0) {
@@ -332,18 +345,33 @@
               </button>
             </div>
           </div>`;
+      } else if(tipo === 'bloqueada') {
+         return `
+          <div class="col-md-6">
+            <div class="p-4 bg-light border rounded shadow-sm h-100" style="border-left: 5px solid #94A3B8; opacity: 0.8;">
+              <h5 class="fw-bold text-muted mb-3"><i class="fas fa-lock me-2"></i> ${ativ.titulo}</h5>
+              <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
+              <button class="btn btn-secondary w-100 fw-bold mt-auto" disabled>
+                 <i class="fas fa-lock me-2"></i> Aguardando Liberação
+              </button>
+            </div>
+          </div>`;
       } else if(tipo === 'concluida') {
+         // Oculta os pontos do aluno, mostrando apenas a porcentagem (Ex: "75%")
+         let notaExibicao = ativ.nota ? ativ.nota.split(' ')[0] : 'Aguardando';
+         
          return `
           <div class="col-md-6">
             <div class="p-4 bg-white border rounded shadow-sm h-100" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="p-3 text-center rounded fw-bold mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Nota Recebida: ${ativ.nota || 'Aguardando'}</div>
+              <div class="p-3 text-center rounded fw-bold mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Desempenho: ${notaExibicao}</div>
             </div>
           </div>`;
       }
     }
 
     function abrirInstrucoes(linhaPlanilha) {
+      // Repare que as bloqueadas NÃO entram aqui, protegendo a prova
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
       cadernoAtivo = pendentes.find(p => p.linhaPlanilha === linhaPlanilha);
       if(!cadernoAtivo || !cadernoAtivo.questoesOriginal || cadernoAtivo.questoesOriginal.length === 0) { Swal.fire('Atenção', 'Questões indisponíveis.', 'warning'); return; }
