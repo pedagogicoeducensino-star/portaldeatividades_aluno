@@ -23,28 +23,35 @@
       --cinza-borda: #E2E8F0;
       --sucesso: #10B981;
       --perigo: #EF4444;
-      --fonte-padrao: 16px; 
+      
+      /* MUDE O TAMANHO DA FONTE AQUI SE ACHAR NECESSÁRIO (Padrão Coordenação: 15px) */
+      --fonte-padrao: 15px; 
     }
     
     body { background-color: var(--cinza-fundo); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--cinza-texto); font-size: var(--fonte-padrao); line-height: 1.6; }
     
+    /* Removemos tamanhos gigantes das classes do bootstrap para respeitar nossa fonte padrão */
+    .fs-1, .fs-2, .fs-3, .fs-4, .fs-5, .fs-6 { font-size: var(--fonte-padrao) !important; }
+    h2, h4, h5 { font-size: 18px !important; font-weight: 700; }
+    h2.titulo-grande { font-size: 24px !important; }
+
     .card-3d { background: var(--cinza-card); border-radius: 20px; padding: 32px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04); border: 1px solid var(--cinza-borda); margin-bottom: 24px; transition: all 0.3s ease;}
     .card-topo-laranja { border-top: 6px solid var(--primaria); }
     .card-topo-amarelo { border-top: 6px solid var(--secundaria); }
     
-    .btn-primario { background-color: var(--primaria); color: white; border: none; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.25); font-weight: 700; padding: 14px 24px; border-radius: 12px; transition: all 0.2s;}
+    .btn-primario { background-color: var(--primaria); color: white; border: none; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.25); font-weight: 700; padding: 12px 24px; border-radius: 12px; transition: all 0.2s;}
     .btn-primario:hover { background-color: var(--primaria-hover); color: white; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);}
     
     .escondido { display: none !important; }
     
-    .relogio-teste { font-size: 24px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 10px 35px; border-radius: 50px; display: inline-block; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 2px;}
-    .progress { background-color: #E2E8F0; border: none; height: 16px; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+    .relogio-teste { font-size: 20px !important; font-weight: 800; color: white; background: var(--marrom-suave); padding: 10px 35px; border-radius: 50px; display: inline-block; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 2px;}
+    .progress { background-color: #E2E8F0; border: none; height: 14px; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
     .progress-bar { background: linear-gradient(90deg, var(--secundaria), var(--primaria)); transition: width 0.5s ease; border-radius: 10px; }
     
-    .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--marrom-suave); transition: all 0.2s; border-radius: 10px;}
+    .input-box-destaque { background-color: #F8FAFC; border: 2px solid #CBD5E1; font-weight: 700; color: var(--marrom-suave); transition: all 0.2s; border-radius: 10px; font-size: var(--fonte-padrao);}
     .input-box-destaque:focus { outline: none; border-color: var(--primaria); box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15); background-color: white;}
     
-    .box-info { background-color: #FFFBEB; border-left: 5px solid var(--secundaria); padding: 20px; border-radius: 12px; color: var(--marrom-suave); font-size: 16px; margin-bottom: 24px;}
+    .box-info { background-color: #FFFBEB; border-left: 5px solid var(--secundaria); padding: 20px; border-radius: 12px; color: var(--marrom-suave); margin-bottom: 24px;}
     
     .noselect { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
   </style>
@@ -54,33 +61,34 @@
   <!-- TELA DE LOGIN DO ALUNO -->
   <div id="telaLogin" class="card-3d card-topo-laranja mx-auto shadow" style="max-width: 450px; margin-top: 12vh;">
     <div class="text-center mb-4">
-      <div class="mb-3"><i class="fas fa-user-astronaut" style="font-size: 55px; color: var(--primaria);"></i></div>
-      <h2 class="fw-bold mb-1" style="color: var(--marrom-suave);">Portal do Aluno</h2>
+      <div class="mb-3"><i class="fas fa-user-astronaut" style="font-size: 45px; color: var(--primaria);"></i></div>
+      <h2 class="titulo-grande fw-bold mb-1" style="color: var(--marrom-suave);">Portal do Aluno</h2>
       <p class="text-muted">Digite sua Matrícula para acessar suas Atividades</p>
     </div>
     <div class="mb-4">
       <label class="form-label fw-bold" style="color: var(--cinza-texto);">Nº da Matrícula:</label>
-      <div class="input-group input-group-lg">
+      <div class="input-group">
         <span class="input-group-text bg-light border-end-0"><i class="fas fa-id-card text-muted"></i></span>
-        <input type="text" id="inputMatricula" class="form-control border-start-0 fs-5" placeholder="Digite sua matrícula..." onkeypress="if(event.key === 'Enter') fazerLoginAluno()">
+        <input type="text" id="inputMatricula" class="form-control border-start-0" placeholder="Digite sua matrícula..." onkeypress="if(event.key === 'Enter') fazerLoginAluno()">
       </div>
     </div>
-    <button class="btn btn-primario w-100 fs-5" onclick="fazerLoginAluno()" id="btnLogin">Acessar Portal <i class="fas fa-rocket ms-2"></i></button>
+    <button class="btn btn-primario w-100" onclick="fazerLoginAluno()" id="btnLogin">Acessar Portal <i class="fas fa-rocket ms-2"></i></button>
   </div>
 
   <!-- TELA DASHBOARD (ATIVIDADES) -->
-  <div id="telaDashboard" class="container py-4 escondido" style="max-width: 1000px;">
+  <!-- MUDE A LARGURA DO SITE AQUI EM BAIXO (max-width) -->
+  <div id="telaDashboard" class="container py-4 escondido" style="max-width: 1200px;">
     <div class="d-flex justify-content-between align-items-center mb-4 card-3d card-topo-amarelo py-4" style="background: linear-gradient(to right, #ffffff, #FFFBEB);">
       <div class="d-flex align-items-center gap-4">
-        <div class="bg-white shadow-sm p-3 rounded-circle text-center border" style="width: 70px; height: 70px; line-height: 35px;">
-            <i class="fas fa-gamepad fs-3" style="color: var(--primaria);"></i>
+        <div class="bg-white shadow-sm p-3 rounded-circle text-center border" style="width: 60px; height: 60px; line-height: 25px;">
+            <i class="fas fa-gamepad fs-4" style="color: var(--primaria);"></i>
         </div>
         <div>
-          <h2 class="mb-1 fw-bold text-dark" id="textoSaudacao">Olá!</h2>
+          <h2 class="titulo-grande mb-1 fw-bold text-dark" id="textoSaudacao">Olá!</h2>
           <span class="text-muted">🔥 Você aprendeu. Agora é hora de mostrar! Confie no seu conhecimento, faça com atenção e dê o seu melhor.</span>
         </div>
       </div>
-      <button class="btn btn-outline-danger fw-bold shadow-sm rounded-pill px-4" onclick="sair()"><i class="fas fa-power-off me-2"></i> Sair</button>
+      <button class="btn btn-outline-danger fw-bold shadow-sm rounded-pill px-4 py-2" onclick="sair()"><i class="fas fa-power-off me-2"></i> Sair</button>
     </div>
 
     <!-- SESSÃO 1: EM ANDAMENTO -->
@@ -109,10 +117,10 @@
   </div>
 
   <!-- TELA DE INSTRUÇÕES (PRÉ-PROVA) -->
-  <div id="telaInstrucoes" class="container py-5 escondido" style="max-width: 850px;">
+  <div id="telaInstrucoes" class="container py-5 escondido" style="max-width: 1000px;">
     <div class="card-3d card-topo-laranja text-center p-5">
-       <i class="fas fa-bullhorn mb-3" style="font-size: 50px; color: var(--secundaria);"></i>
-       <h2 class="fw-bold mb-4 text-dark" id="infoTituloProva">Título da Prova</h2>
+       <i class="fas fa-bullhorn mb-3" style="font-size: 45px; color: var(--secundaria);"></i>
+       <h2 class="titulo-grande fw-bold mb-4 text-dark" id="infoTituloProva">Título da Prova</h2>
        
        <div class="text-start mb-4 p-4 rounded shadow-sm" style="background-color: #FFFBEB; border: 1px solid var(--secundaria);">
            <h5 class="fw-bold text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i> ATENÇÃO!</h5>
@@ -142,10 +150,11 @@
   </div>
 
   <!-- TELA DE EXECUÇÃO DA PROVA -->
-  <div id="telaExecucaoProva" class="container py-4 escondido noselect" style="max-width: 950px;">
+  <!-- MUDE A LARGURA DA PROVA AQUI EM BAIXO (max-width) -->
+  <div id="telaExecucaoProva" class="container py-4 escondido noselect" style="max-width: 1100px;">
     <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-pill shadow-sm border">
-        <div class="ms-3 fw-bold text-dark fs-5"><i class="fas fa-book-open me-2" style="color: var(--primaria);"></i> <span id="tituloProvaExecucao">Atividade</span></div>
-        <button class="btn btn-outline-danger fw-bold rounded-pill" onclick="pausarEGuardar()">
+        <div class="ms-3 fw-bold text-dark"><i class="fas fa-book-open me-2" style="color: var(--primaria);"></i> <span id="tituloProvaExecucao">Atividade</span></div>
+        <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3 py-2" onclick="pausarEGuardar()">
             <i class="fas fa-save me-1"></i> Salvar e Sair
         </button>
     </div>
@@ -154,8 +163,8 @@
       <div class="relogio-teste mx-auto mb-4" id="relogioTeste"><i class="fas fa-stopwatch"></i> 0s</div>
       
       <div class="d-flex justify-content-between align-items-end mb-2 px-2">
-        <span class="fw-bold fs-5 text-secondary" id="textoProgresso">Questão 1 de X</span>
-        <span class="fw-bold fs-5" style="color: var(--primaria);" id="percentualProgresso">0%</span>
+        <span class="fw-bold text-secondary" id="textoProgresso">Questão 1 de X</span>
+        <span class="fw-bold" style="color: var(--primaria);" id="percentualProgresso">0%</span>
       </div>
       <div class="progress shadow-sm mb-4">
         <div id="barraProgresso" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
@@ -167,7 +176,7 @@
     </div>
 
     <div class="text-center mt-4 pb-5">
-      <button id="btnAvancar" class="btn btn-secondary w-100 shadow fw-bold mb-3" disabled onclick="avancarQuestao()" style="padding: 16px; font-size: 18px; border-radius: 12px;">
+      <button id="btnAvancar" class="btn btn-secondary w-100 shadow fw-bold mb-3" disabled onclick="avancarQuestao()" style="padding: 14px; border-radius: 12px;">
         Aguarde o tempo...
       </button>
     </div>
@@ -286,7 +295,7 @@
       const containerConcluidas = document.getElementById('listaConcluidas');
       const containerBloqueadas = document.getElementById('listaBloqueadas');
       
-      containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted"><i class="fas fa-spinner fa-spin fs-2"></i></div>';
+      containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted"><i class="fas fa-spinner fa-spin mb-2" style="font-size: 30px;"></i></div>';
       
       fetch(`${URL_API_GOOGLE}?api=painelAluno&matricula=${dadosAluno.matricula}`)
         .then(res => res.json())
@@ -299,23 +308,23 @@
           document.getElementById('sessaoEmAndamento').classList.remove('escondido');
           if(painel.em_andamento && painel.em_andamento.length > 0) {
             painel.em_andamento.forEach(ativ => containerEmAndamento.innerHTML += gerarCardHTML(ativ, 'andamento'));
-          } else { containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-pause-circle fs-3 mb-2 opacity-50"></i><br>Nenhuma atividade pausada.</div>'; }
+          } else { containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-pause-circle mb-2 opacity-50" style="font-size: 30px;"></i><br>Nenhuma atividade pausada.</div>'; }
 
           document.getElementById('sessaoPendentes').classList.remove('escondido');
           if(painel.a_fazer && painel.a_fazer.length > 0) {
              painel.a_fazer.forEach(ativ => containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer'));
-          } else { containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot fs-3 mb-2 opacity-50"></i><br>Nenhuma atividade pendente no momento!</div>'; }
+          } else { containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot mb-2 opacity-50" style="font-size: 30px;"></i><br>Nenhuma atividade pendente no momento!</div>'; }
 
-          // NOVA SESSÃO DE BLOQUEADAS
+          // SESSÃO DE BLOQUEADAS
           document.getElementById('sessaoBloqueadas').classList.remove('escondido');
           if(painel.bloqueadas && painel.bloqueadas.length > 0) {
              painel.bloqueadas.forEach(ativ => containerBloqueadas.innerHTML += gerarCardHTML(ativ, 'bloqueada'));
-          } else { containerBloqueadas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-lock-open fs-3 mb-2 opacity-50"></i><br>Nenhuma atividade bloqueada.</div>'; }
+          } else { containerBloqueadas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-lock-open mb-2 opacity-50" style="font-size: 30px;"></i><br>Nenhuma atividade bloqueada.</div>'; }
 
           document.getElementById('sessaoConcluidas').classList.remove('escondido');
           if(painel.concluidas && painel.concluidas.length > 0) {
              painel.concluidas.forEach(ativ => containerConcluidas.innerHTML += gerarCardHTML(ativ, 'concluida'));
-          } else { containerConcluidas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-medal fs-3 mb-2 opacity-50"></i><br>Boletim vazio. Finalize uma atividade primeiro.</div>'; }
+          } else { containerConcluidas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-medal mb-2 opacity-50" style="font-size: 30px;"></i><br>Boletim vazio. Finalize uma atividade primeiro.</div>'; }
         });
     }
 
@@ -329,7 +338,7 @@
             <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--secundaria);">
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
               <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
-              <button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave);" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
+              <button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave); padding: 10px;" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
                  <i class="fas fa-play me-2"></i> Continuar Atividade
               </button>
             </div>
@@ -340,7 +349,7 @@
             <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--primaria);">
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
               <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
-              <button class="btn btn-primario w-100 fw-bold mt-auto" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
+              <button class="btn btn-primario w-100 fw-bold mt-auto py-2" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
                  <i class="fas fa-pen me-2"></i> Iniciar Agora
               </button>
             </div>
@@ -351,15 +360,13 @@
             <div class="p-4 bg-light border rounded shadow-sm h-100" style="border-left: 5px solid #94A3B8; opacity: 0.8;">
               <h5 class="fw-bold text-muted mb-3"><i class="fas fa-lock me-2"></i> ${ativ.titulo}</h5>
               <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
-              <button class="btn btn-secondary w-100 fw-bold mt-auto" disabled>
+              <button class="btn btn-secondary w-100 fw-bold mt-auto py-2" disabled>
                  <i class="fas fa-lock me-2"></i> Aguardando Liberação
               </button>
             </div>
           </div>`;
       } else if(tipo === 'concluida') {
-         // Oculta os pontos do aluno, mostrando apenas a porcentagem (Ex: "75%")
-         let notaExibicao = ativ.nota ? ativ.nota.split(' ')[0] : 'Aguardando';
-         
+         let notaExibicao = ativ.nota ? ativ.nota : 'Aguardando';
          return `
           <div class="col-md-6">
             <div class="p-4 bg-white border rounded shadow-sm h-100" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
@@ -371,7 +378,6 @@
     }
 
     function abrirInstrucoes(linhaPlanilha) {
-      // Repare que as bloqueadas NÃO entram aqui, protegendo a prova
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
       cadernoAtivo = pendentes.find(p => p.linhaPlanilha === linhaPlanilha);
       if(!cadernoAtivo || !cadernoAtivo.questoesOriginal || cadernoAtivo.questoesOriginal.length === 0) { Swal.fire('Atenção', 'Questões indisponíveis.', 'warning'); return; }
@@ -432,7 +438,7 @@
       if(q.tipo === "estudo_caso") html += '<div class="estudo-caso-box shadow-sm">' + (q.contexto || "").replace(/\n/g, '<br>') + '</div>';
       
       if(q.tipo === "lacunas") {
-        let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:40px; font-size:16px;" oninput="verificarPreenchimento()">');
+        let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:35px;" oninput="verificarPreenchimento()">');
         html += '<p class="fw-bold mb-4 text-dark">' + enunciadoFmt + '</p>';
       } else if(q.tipo !== "assercao_razao") { html += '<p class="fw-bold mb-4 text-dark" style="line-height: 1.5;">' + (q.enunciado || "") + '</p>'; }
 
@@ -450,12 +456,12 @@
         html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`; (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm"><strong>${idx+1}.</strong> ${item}</div>`; }); html += `</div><div class="col-sm-7 ps-4">`;
         (q.colunaB || []).forEach((item, idx) => { 
           let dItem = (q.b_is_img && item.startsWith('http')) ? `<img src="${item}" class="rounded border" style="max-height:60px;">` : `<span class="fw-bold">${item}</span>`;
-          html += `<div class="d-flex align-items-center mb-3 bg-white p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:45px; height:45px; font-size:16px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
+          html += `<div class="d-flex align-items-center mb-3 bg-white p-2 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:40px; height:40px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
         }); html += `</div></div>`;
       } else if (q.tipo === "ordenacao") {
-        q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:45px; height:45px; font-size:16px;" oninput="verificarPreenchimento()"></div></div>`; });
+        q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:40px; height:40px;" oninput="verificarPreenchimento()"></div></div>`; });
       } else if (q.tipo === "verdadeiro_falso_mult") {
-        q.lista.forEach(item => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-4 p-0 text-uppercase" style="width:45px; height:45px; font-weight:800; font-size:16px;" maxlength="1" oninput="verificarPreenchimento()"><span class="fw-bold text-dark">${item}</span></div>`; });
+        q.lista.forEach(item => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-4 p-0 text-uppercase" style="width:40px; height:40px; font-weight:800;" maxlength="1" oninput="verificarPreenchimento()"><span class="fw-bold text-dark">${item}</span></div>`; });
       } else if (q.tipo !== "lacunas") {
         html += `<textarea class="form-control in-teste p-3 shadow-sm" style="border: 2px solid var(--primaria); font-weight: 600; background-color: #FFFBEB; border-radius: 12px;" rows="6" placeholder="Digite sua resposta com as próprias palavras aqui..." oninput="verificarPreenchimento()"></textarea>`;
       }
@@ -569,32 +575,56 @@
       });
     }
 
+    // ====================================================================================
+    // CÁLCULO DE NOTA ATUALIZADO (10 PONTOS DIVIDIDOS PELO NÚMERO DE QUESTÕES)
+    // ====================================================================================
     function finalizarEEnviarProva() {
       Swal.fire({ title: 'Finalizando...', text: 'Corrigindo a prova e enviando ao professor.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
-      let somaAcertos = 0; let totalQuestoes = cadernoAtivo.questoesOriginal.length; let notaPontos = 0;
+      let somaAcertos = 0; 
+      let totalQuestoes = cadernoAtivo.questoesOriginal.length; 
 
       cadernoAtivo.questoesOriginal.forEach((q, i) => {
-        let respAluno = respostasAluno[i] || ""; let ptsQuestao = parseFloat(q.pontos) || 0; let acertoFracao = 0;
+        let respAluno = respostasAluno[i] || ""; 
+        let acertoFracao = 0;
 
         if(["dissertativa", "estudo_caso", "resposta_curta"].includes(q.tipo)) {
           let gruposChaves = (q.criterios || q.resposta || "").split(/[,;]+/).map(g => g.trim().toLowerCase()).filter(g => g.length > 0);
-          let respAlunoMin = respAluno.toLowerCase(); let encontradas = 0;
+          let respAlunoMin = respAluno.toLowerCase(); 
+          let encontradas = 0;
           gruposChaves.forEach(grupo => { if(grupo.split('/').some(s => respAlunoMin.includes(s.trim()))) encontradas++; });
           let pctItem = gruposChaves.length > 0 ? (encontradas / gruposChaves.length) : 0;
-          if (pctItem >= 0.8) acertoFracao = 1; else if (pctItem >= 0.5) acertoFracao = 0.75; else if (pctItem >= 0.25) acertoFracao = 0.40;
+          
+          if (pctItem >= 0.8) acertoFracao = 1; 
+          else if (pctItem >= 0.5) acertoFracao = 0.75; 
+          else if (pctItem >= 0.25) acertoFracao = 0.40;
         } else {
           let respEsp = q.resposta || "";
           if(q.tipo === 'assercao_razao') { let mapR = {"A":"I", "B":"II", "C":"III", "D":"IV", "E":"V"}; if(mapR[respEsp]) respEsp = mapR[respEsp]; }
-          if(respAluno.replace(/\s/g, '').toLowerCase() === respEsp.replace(/\s/g, '').toLowerCase()) acertoFracao = 1;
+          // Conta acerto se for exatamente igual e se não estiver em branco
+          if(respAluno.replace(/\s/g, '').toLowerCase() === respEsp.replace(/\s/g, '').toLowerCase() && respAluno !== "") {
+             acertoFracao = 1;
+          }
         }
-        somaAcertos += acertoFracao; notaPontos += (acertoFracao * ptsQuestao);
+        
+        somaAcertos += acertoFracao; 
       });
 
-      let pctFinal = totalQuestoes > 0 ? Math.round((somaAcertos / totalQuestoes) * 100) : 0;
-      let notaString = pctFinal + "% (" + notaPontos + " pts)";
+      // Lógica matemática para dar nota de 0 a 10
+      let valorPorQuestao = 10 / totalQuestoes;
+      let notaFinalCalculada = somaAcertos * valorPorQuestao;
+      
+      // Formata a nota para ficar bonitinha (Ex: tira o .0 se for número quebrado, ex: 10.0 vira 10)
+      let notaFormatada = notaFinalCalculada.toFixed(1).replace('.0', '');
+      let notaString = "Nota: " + notaFormatada + " / 10 Pontos";
 
-      let pacoteEnvio = { api: 'finalizarAtividade', linhaPlanilha: cadernoAtivo.linhaPlanilha, respostas: respostasAluno, notaFinal: notaString, tempoRestante: 0 };
+      let pacoteEnvio = { 
+          api: 'finalizarAtividade', 
+          linhaPlanilha: cadernoAtivo.linhaPlanilha, 
+          respostas: respostasAluno, 
+          notaFinal: notaString, 
+          tempoRestante: 0 
+      };
 
       fetch(URL_API_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(pacoteEnvio) })
       .then(res => res.json()).then(resp => {
