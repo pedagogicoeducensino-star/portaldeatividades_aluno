@@ -56,7 +56,7 @@
     <div class="text-center mb-4">
       <div class="mb-3"><i class="fas fa-user-astronaut" style="font-size: 55px; color: var(--primaria);"></i></div>
       <h2 class="fw-bold mb-1" style="color: var(--marrom-suave);">Portal do Aluno</h2>
-      <p class="text-muted">Conecte-se para acessar suas missões</p>
+      <p class="text-muted">Digite sua Matrícula para acessar suas Atividades</p>
     </div>
     <div class="mb-4">
       <label class="form-label fw-bold" style="color: var(--cinza-texto);">Nº da Matrícula:</label>
@@ -77,7 +77,7 @@
         </div>
         <div>
           <h2 class="mb-1 fw-bold text-dark" id="textoSaudacao">Olá!</h2>
-          <span class="text-muted">Pronto para dar continuidade aos seus estudos hoje?</span>
+          <span class="text-muted">🔥 Você aprendeu. Agora é hora de mostrar! Confie no seu conhecimento, faça com atenção e dê o seu melhor.</span>
         </div>
       </div>
       <button class="btn btn-outline-danger fw-bold shadow-sm rounded-pill px-4" onclick="sair()"><i class="fas fa-power-off me-2"></i> Sair</button>
@@ -97,13 +97,13 @@
 
     <!-- SESSÃO 3: BLOQUEADAS (NOVIDADE) -->
     <div class="card-3d mb-4" style="border-top: none; background-color: #F8FAFC;" id="sessaoBloqueadas">
-      <h4 class="mb-4 fw-bold text-muted"><i class="fas fa-lock me-2"></i> Próximas Missões (Bloqueadas)</h4>
+      <h4 class="mb-4 fw-bold text-muted"><i class="fas fa-lock me-2"></i> Próximas Atividades (Bloqueadas)</h4>
       <div id="listaBloqueadas" class="row g-4"></div>
     </div>
 
     <!-- SESSÃO 4: CONCLUÍDAS (BOLETIM) -->
     <div class="card-3d" style="border-top: none; background-color: #F8FAFC;" id="sessaoConcluidas">
-      <h4 class="mb-4 fw-bold text-dark"><i class="fas fa-award me-2" style="color: var(--sucesso);"></i> Meu Boletim Escolar</h4>
+      <h4 class="mb-4 fw-bold text-dark"><i class="fas fa-award me-2" style="color: var(--sucesso);"></i> Atividades Finalizadas</h4>
       <div id="listaConcluidas" class="row g-4"></div>
     </div>
   </div>
@@ -299,18 +299,18 @@
           document.getElementById('sessaoEmAndamento').classList.remove('escondido');
           if(painel.em_andamento && painel.em_andamento.length > 0) {
             painel.em_andamento.forEach(ativ => containerEmAndamento.innerHTML += gerarCardHTML(ativ, 'andamento'));
-          } else { containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-pause-circle fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pausada.</div>'; }
+          } else { containerEmAndamento.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-pause-circle fs-3 mb-2 opacity-50"></i><br>Nenhuma atividade pausada.</div>'; }
 
           document.getElementById('sessaoPendentes').classList.remove('escondido');
           if(painel.a_fazer && painel.a_fazer.length > 0) {
              painel.a_fazer.forEach(ativ => containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer'));
-          } else { containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot fs-3 mb-2 opacity-50"></i><br>Nenhuma avaliação pendente no momento!</div>'; }
+          } else { containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot fs-3 mb-2 opacity-50"></i><br>Nenhuma atividade pendente no momento!</div>'; }
 
           // NOVA SESSÃO DE BLOQUEADAS
           document.getElementById('sessaoBloqueadas').classList.remove('escondido');
           if(painel.bloqueadas && painel.bloqueadas.length > 0) {
              painel.bloqueadas.forEach(ativ => containerBloqueadas.innerHTML += gerarCardHTML(ativ, 'bloqueada'));
-          } else { containerBloqueadas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-lock-open fs-3 mb-2 opacity-50"></i><br>Nenhuma missão bloqueada.</div>'; }
+          } else { containerBloqueadas.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-lock-open fs-3 mb-2 opacity-50"></i><br>Nenhuma atividade bloqueada.</div>'; }
 
           document.getElementById('sessaoConcluidas').classList.remove('escondido');
           if(painel.concluidas && painel.concluidas.length > 0) {
@@ -330,7 +330,7 @@
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
               <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
               <button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave);" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
-                 <i class="fas fa-play me-2"></i> Continuar Prova
+                 <i class="fas fa-play me-2"></i> Continuar Atividade
               </button>
             </div>
           </div>`;
