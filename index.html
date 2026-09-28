@@ -387,7 +387,7 @@
               </button>
             </div>
           </div>`;
-} else if(tipo === 'concluida') {
+      } else if(tipo === 'concluida') {
          let notaExibicao = ativ.nota ? ativ.nota.split("|")[0] : 'Aguardando';
          return `
           <div class="col-md-6">
@@ -400,6 +400,7 @@
             </div>
           </div>`;
       }
+    } // <-- ESTA CHAVE ESTAVA FALTANDO!
 
     function abrirInstrucoes(linhaPlanilha) {
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
@@ -638,7 +639,7 @@
       let valorPorQuestao = 10 / totalQuestoes;
       let notaFinalCalculada = somaAcertos * valorPorQuestao;
       
-// Formata a nota para ficar bonitinha (Ex: tira o .0 se for número quebrado, ex: 10.0 vira 10)
+      // Formata a nota para ficar bonitinha (Ex: tira o .0 se for número quebrado, ex: 10.0 vira 10)
       let notaFormatada = notaFinalCalculada.toFixed(1).replace('.0', '');
       // Manda a Nota e os Acertos separados por "|" para a coordenação ler
       let notaString = notaFormatada + "|" + somaAcertos + "/" + totalQuestoes;
@@ -660,7 +661,7 @@
       });
     }
 
-      function abrirCorrecao(linhaPlanilha) {
+    function abrirCorrecao(linhaPlanilha) {
         let ativ = painelCompleto.concluidas.find(p => p.linhaPlanilha === linhaPlanilha);
         if(!ativ || !ativ.questoesOriginal) return;
 
