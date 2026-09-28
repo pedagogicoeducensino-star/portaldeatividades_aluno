@@ -213,10 +213,13 @@
     let dadosAluno = null;
     let painelCompleto = null;
     let cadernoAtivo = null;
-    let indiceAtual = 0;
     let respostasAluno = [];
     let tempoRestante = 0;
     let timerIntervalo = null;
+    
+    // SISTEMA DE MAPEAMENTO E EMBARALHAMENTO SEGURO
+    let ordemExibicao = [];
+    let passoAtual = 0;
 
     // BLOQUEIOS ANTI-COLA E MUDANÇA DE ABA
     document.addEventListener('copy', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
@@ -240,7 +243,8 @@
                 confirmButtonText: 'Estou ciente, vou focar'
              }).then((result) => {
                 if (result.isConfirmed) {
-                    const q = cadernoAtivo.questoesOriginal[indiceAtual];
+                    let indiceReal = window.ordemExibicao[window.passoAtual];
+                    const q = cadernoAtivo.questoesOriginal[indiceReal];
                     tempoRestante = parseInt(q.tempo || 60);
                     
                     const btn = document.getElementById('btnAvancar');
@@ -400,7 +404,7 @@
             </div>
           </div>`;
       }
-    } // <-- ESTA CHAVE ESTAVA FALTANDO!
+    }
 
     function abrirInstrucoes(linhaPlanilha) {
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
@@ -415,6 +419,7 @@
     }
 
     function prepararExecucao() {
+      // 1. Salvar no servidor que começou
       fetch(URL_API_GOOGLE, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -426,27 +431,56 @@
           })
       }); 
 
+      // 2. Restaurar ou criar array de respostas garantindo o tamanho correto
       if (cadernoAtivo.respostasSalvas && cadernoAtivo.respostasSalvas.length === cadernoAtivo.questoesOriginal.length) {
-          respostasAluno = cadernoAtivo.respostasSalvas;
+          respostasAluno = [...cadernoAtivo.respostasSalvas];
       } else {
-          if(cadernoAtivo.embaralhar) cadernoAtivo.questoesOriginal = cadernoAtivo.questoesOriginal.sort(() => Math.random() - 0.5);
           respostasAluno = new Array(cadernoAtivo.questoesOriginal.length).fill(null);
       }
       
-      indiceAtual = respostasAluno.findIndex(r => r === null || r === "");
-      if(indiceAtual === -1) indiceAtual = 0; 
+      // 3. Criar a "Lista de Reprodução" original [0, 1, 2, 3...]
+      window.ordemExibicao = [];
+      for (let i = 0; i < cadernoAtivo.questoesOriginal.length; i++) {
+          window.ordemExibicao.push(i);
+      }
+
+      // 4. Se embaralhar estiver ativado, embaralha APENAS a "Lista de Reprodução" (Playlist visual)
+      // O banco de dados e o array de respostas continuam fiéis às posições originais da sua planilha!
+      if (cadernoAtivo.embaralhar) {
+          window.ordemExibicao.sort(() => Math.random() - 0.5);
+      }
+      
+      // 5. Encontrar qual é a próxima pergunta da playlist que ainda não foi respondida
+      window.passoAtual = 0;
+      while (window.passoAtual < window.ordemExibicao.length) {
+          let indiceParaTestar = window.ordemExibicao[window.passoAtual];
+          if (respostasAluno[indiceParaTestar] === null || respostasAluno[indiceParaTestar] === "") {
+              break; // Achou uma questão vazia
+          }
+          window.passoAtual++;
+      }
+      
+      // Prevenção de erro caso o aluno tenha preenchido tudo
+      if (window.passoAtual >= window.ordemExibicao.length) {
+          window.passoAtual = 0; 
+      }
 
       alternarTela('telaExecucaoProva');
       renderizarQuestao();
     }
 
     function renderizarQuestao() {
-      if(indiceAtual >= cadernoAtivo.questoesOriginal.length) { finalizarEEnviarProva(); return; }
+      // Se terminou a playlist, envia
+      if(window.passoAtual >= window.ordemExibicao.length) { finalizarEEnviarProva(); return; }
       
-      const q = cadernoAtivo.questoesOriginal[indiceAtual];
+      // Pega o número REAL da questão com base na Playlist
+      let indiceReal = window.ordemExibicao[window.passoAtual];
+      const q = cadernoAtivo.questoesOriginal[indiceReal];
       tempoRestante = parseInt(q.tempo || 60);
       
-      let numAtual = indiceAtual + 1; let totalQ = cadernoAtivo.questoesOriginal.length; let pct = Math.round(((indiceAtual) / totalQ) * 100);
+      let numAtual = window.passoAtual + 1; 
+      let totalQ = window.ordemExibicao.length; 
+      let pct = Math.round(((window.passoAtual) / totalQ) * 100);
       
       document.getElementById('textoProgresso').innerText = 'Questão ' + numAtual + ' de ' + totalQ;
       document.getElementById('percentualProgresso').innerText = pct + '%'; document.getElementById('barraProgresso').style.width = pct + '%';
@@ -531,13 +565,24 @@
         inputs.forEach(inp => { if(inp.value.trim() === '') allFilled = false; });
         if(allFilled) respondeu = true; 
       }
+      
+      // Verifica se as perguntas RESTANTES da playlist já estão respondidas 
+      // (Isso impede que ele exija apertar "Próximo" eternamente se já respondeu as últimas na tentativa anterior)
+      let eUltima = true;
+      for (let i = window.passoAtual + 1; i < window.ordemExibicao.length; i++) {
+          let indiceParaTestar = window.ordemExibicao[i];
+          if (respostasAluno[indiceParaTestar] === null || respostasAluno[indiceParaTestar] === "") {
+              eUltima = false;
+              break;
+          }
+      }
 
       const btn = document.getElementById('btnAvancar');
       if(respondeu || (radios.length === 0 && inputs.length === 0)) { 
         btn.disabled = false;
         btn.style.backgroundColor = "var(--sucesso)";
         btn.style.color = "white";
-        btn.innerHTML = (indiceAtual === cadernoAtivo.questoesOriginal.length - 1) ? 'Finalizar Atividade <i class="fas fa-flag-checkered ms-2"></i>' : 'Confirmar e Avançar <i class="fas fa-arrow-right ms-2"></i>';
+        btn.innerHTML = eUltima ? 'Finalizar Atividade <i class="fas fa-flag-checkered ms-2"></i>' : 'Confirmar e Avançar <i class="fas fa-arrow-right ms-2"></i>';
       } else {
         btn.disabled = true;
         btn.style.backgroundColor = "#6c757d";
@@ -546,22 +591,35 @@
     }
 
     function capturarRespostaAtual() {
-      const q = cadernoAtivo.questoesOriginal[indiceAtual];
+      let indiceReal = window.ordemExibicao[window.passoAtual];
+      const q = cadernoAtivo.questoesOriginal[indiceReal];
+      
       if(["multipla_escolha", "certo_errado", "assercao_razao"].includes(q.tipo)) {
         const rad = document.querySelector('input[name="respProva"]:checked');
-        if(rad) respostasAluno[indiceAtual] = rad.value;
+        if(rad) respostasAluno[indiceReal] = rad.value;
       } else {
         const inputs = document.querySelectorAll('.in-teste');
         if(inputs.length > 0) {
             let vals = []; inputs.forEach(i => vals.push(i.value.trim().toUpperCase()));
-            respostasAluno[indiceAtual] = vals.join(", ");
+            respostasAluno[indiceReal] = vals.join(", ");
         }
       }
     }
 
     function avancarQuestao() {
       capturarRespostaAtual();
-      indiceAtual++; 
+      
+      window.passoAtual++; 
+      
+      // Magia: pula direto para a próxima questão não respondida se ele pausou/voltou!
+      while (window.passoAtual < window.ordemExibicao.length) {
+          let indiceParaTestar = window.ordemExibicao[window.passoAtual];
+          if (respostasAluno[indiceParaTestar] === null || respostasAluno[indiceParaTestar] === "") {
+              break;
+          }
+          window.passoAtual++;
+      }
+      
       renderizarQuestao();
     }
 
@@ -635,13 +693,10 @@
         somaAcertos += acertoFracao; 
       });
 
-      // Lógica matemática para dar nota de 0 a 10
       let valorPorQuestao = 10 / totalQuestoes;
       let notaFinalCalculada = somaAcertos * valorPorQuestao;
       
-      // Formata a nota para ficar bonitinha (Ex: tira o .0 se for número quebrado, ex: 10.0 vira 10)
       let notaFormatada = notaFinalCalculada.toFixed(1).replace('.0', '');
-      // Manda a Nota e os Acertos separados por "|" para a coordenação ler
       let notaString = notaFormatada + "|" + somaAcertos + "/" + totalQuestoes;
       
       let pacoteEnvio = { 
@@ -676,7 +731,6 @@
             let icone = "";
             let respEsperadaParaExibir = q.resposta || ""; 
 
-            // Avaliação de Discursivas (Mesma lógica segura da coordenação)
             if(["dissertativa", "estudo_caso", "resposta_curta"].includes(q.tipo)) {
                 let criterios = q.criterios || q.resposta || ""; 
                 let gruposChaves = criterios.split(/[,;]+/).map(g => g.trim().toLowerCase()).filter(g => g.length > 0);
@@ -701,7 +755,6 @@
                     status = "Não Contemplada (Insatisfatório)"; corStatusHex = "var(--perigo)"; icone = "<i class='fas fa-times text-white'></i>"; 
                 }
             } else {
-                // Avaliação de Objetivas
                 if(q.tipo === 'assercao_razao') {
                     let mapRetro = {"A":"I", "B":"II", "C":"III", "D":"IV", "E":"V"};
                     if(mapRetro[respEsperadaParaExibir]) respEsperadaParaExibir = mapRetro[respEsperadaParaExibir];
