@@ -391,8 +391,27 @@
               </button>
             </div>
           </div>`;
-      } else if(tipo === 'concluida') {
-         let notaExibicao = ativ.nota ? ativ.nota.split("|")[0] : 'Aguardando';
+} else if(tipo === 'concluida') {
+         let notaExibicao = 'Aguardando';
+         
+         if(ativ.nota) {
+             if(ativ.nota.includes("|")) {
+                 // Novo formato recebido: "Nota|Acertos/Total" (Ex: "4.6|4.6/10")
+                 let proporcao = ativ.nota.split("|")[1]; 
+                 let acertos = parseFloat(proporcao.split("/")[0]);
+                 let totalQuestoes = parseFloat(proporcao.split("/")[1]);
+                 
+                 // Calcula a percentagem exata
+                 let percentual = Math.round((acertos / totalQuestoes) * 100);
+                 notaExibicao = percentual + "% de Acertos";
+             } else if (ativ.nota.includes("%")) {
+                 // Caso existam provas antigas gravadas com o formato "60% (8 pts)"
+                 notaExibicao = ativ.nota.split("(")[0].trim(); 
+             } else {
+                 notaExibicao = ativ.nota;
+             }
+         }
+
          return `
           <div class="col-md-6">
             <div class="p-4 bg-white border rounded shadow-sm h-100 d-flex flex-column" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
@@ -662,7 +681,7 @@
     // CÁLCULO DE NOTA ATUALIZADO (10 PONTOS DIVIDIDOS PELO NÚMERO DE QUESTÕES)
     // ====================================================================================
     function finalizarEEnviarProva() {
-      Swal.fire({ title: 'Finalizando...', text: 'Corrigindo a prova e enviando ao professor.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+      Swal.fire({ title: 'Finalizando...', text: 'Corrigindo a atividade e enviando ao professor.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
       let somaAcertos = 0; 
       let totalQuestoes = cadernoAtivo.questoesOriginal.length; 
