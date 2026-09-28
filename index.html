@@ -182,6 +182,28 @@
     </div>
   </div>
 
+  <!-- TELA DE CORREÇÃO (GABARITO DO ALUNO) -->
+  <div id="telaCorrecao" class="container py-4 escondido" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border">
+        <div class="ms-2 fw-bold text-dark fs-5"><i class="fas fa-check-double me-2" style="color: var(--sucesso);"></i> Correção Detalhada</div>
+        <button class="btn btn-sm btn-outline-secondary fw-bold rounded-pill px-3 py-2" onclick="alternarTela('telaDashboard')">
+            <i class="fas fa-arrow-left me-1"></i> Voltar ao Boletim
+        </button>
+    </div>
+    
+    <div class="alert alert-info border-0 shadow-sm mb-4" style="background-color: #F0F9FF; color: #0369A1;">
+        <i class="fas fa-info-circle me-2"></i> <strong>Atenção:</strong> Nas questões discursivas, sua resposta não precisa ser idêntica ao gabarito esperado. O sistema avalia se você abordou os conceitos principais.
+    </div>
+
+    <div id="areaRelatorioCorrecao">
+        <!-- Preenchido via JS -->
+    </div>
+    
+    <div class="text-center mt-4 pb-5">
+       <button class="btn btn-primario fw-bold shadow px-5 py-3 rounded-pill" onclick="alternarTela('telaDashboard')"><i class="fas fa-arrow-left me-2"></i> Voltar ao Painel Principal</button>
+    </div>
+  </div>
+  
   <script>
     // =========================================================================
     // COLE AQUI A SUA URL DO GOOGLE APPS SCRIPT
@@ -365,17 +387,19 @@
               </button>
             </div>
           </div>`;
-      } else if(tipo === 'concluida') {
-         let notaExibicao = ativ.nota ? ativ.nota : 'Aguardando';
+} else if(tipo === 'concluida') {
+         let notaExibicao = ativ.nota ? ativ.nota.split("|")[0] : 'Aguardando';
          return `
           <div class="col-md-6">
-            <div class="p-4 bg-white border rounded shadow-sm h-100" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
+            <div class="p-4 bg-white border rounded shadow-sm h-100 d-flex flex-column" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
               <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="p-3 text-center rounded fw-bold mt-auto" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Desempenho: ${notaExibicao}</div>
+              <div class="p-3 text-center rounded fw-bold mb-3" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Desempenho: ${notaExibicao}</div>
+              <button class="btn btn-outline-success w-100 fw-bold mt-auto py-2" onclick="abrirCorrecao(${ativ.linhaPlanilha})">
+                 <i class="fas fa-search-plus me-2"></i> Ver Correção e Gabaritos
+              </button>
             </div>
           </div>`;
       }
-    }
 
     function abrirInstrucoes(linhaPlanilha) {
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
@@ -634,6 +658,92 @@
              .then(() => { alternarTela('telaDashboard'); carregarAtividadesPendentes(); });
          } else { Swal.fire('Ops', resp.erro || 'Erro ao processar', 'error'); }
       });
+    }
+
+      function abrirCorrecao(linhaPlanilha) {
+        let ativ = painelCompleto.concluidas.find(p => p.linhaPlanilha === linhaPlanilha);
+        if(!ativ || !ativ.questoesOriginal) return;
+
+        let htmlGabarito = "";
+        let questoes = ativ.questoesOriginal;
+        let respostasAluno = ativ.respostasSalvas || [];
+
+        questoes.forEach((q, i) => {
+            let respAluno = respostasAluno[i] || "";
+            let status = ""; 
+            let corStatusHex = ""; 
+            let icone = "";
+            let respEsperadaParaExibir = q.resposta || ""; 
+
+            // Avaliação de Discursivas (Mesma lógica segura da coordenação)
+            if(["dissertativa", "estudo_caso", "resposta_curta"].includes(q.tipo)) {
+                let criterios = q.criterios || q.resposta || ""; 
+                let gruposChaves = criterios.split(/[,;]+/).map(g => g.trim().toLowerCase()).filter(g => g.length > 0);
+                let respAlunoMin = respAluno.toLowerCase();
+                let encontradas = 0;
+                
+                gruposChaves.forEach(grupo => {
+                    let sinomimos = grupo.split('/').map(s => s.trim());
+                    let achouNesteGrupo = sinomimos.some(s => respAlunoMin.includes(s));
+                    if(achouNesteGrupo) encontradas++;
+                });
+                
+                let percentualItem = gruposChaves.length > 0 ? (encontradas / gruposChaves.length) : 0;
+                
+                if (percentualItem >= 0.8) { 
+                    status = "100% Contemplada (Excelente)"; corStatusHex = "var(--sucesso)"; icone = "<i class='fas fa-star text-white'></i>"; 
+                } else if (percentualItem >= 0.5) { 
+                    status = "Contemplada (Satisfatório)"; corStatusHex = "#0EA5E9"; icone = "<i class='fas fa-check text-white'></i>"; 
+                } else if (percentualItem >= 0.25) { 
+                    status = "Parcialmente Contemplada"; corStatusHex = "var(--secundaria)"; icone = "<i class='fas fa-exclamation-triangle text-dark'></i>"; 
+                } else { 
+                    status = "Não Contemplada (Insatisfatório)"; corStatusHex = "var(--perigo)"; icone = "<i class='fas fa-times text-white'></i>"; 
+                }
+            } else {
+                // Avaliação de Objetivas
+                if(q.tipo === 'assercao_razao') {
+                    let mapRetro = {"A":"I", "B":"II", "C":"III", "D":"IV", "E":"V"};
+                    if(mapRetro[respEsperadaParaExibir]) respEsperadaParaExibir = mapRetro[respEsperadaParaExibir];
+                }
+
+                let aLimpo = respAluno.replace(/\s/g, '').toLowerCase(); 
+                let gLimpo = respEsperadaParaExibir.replace(/\s/g, '').toLowerCase();
+                
+                if(aLimpo === gLimpo && aLimpo !== "") { 
+                    status = "Exato (Acertou)"; corStatusHex = "var(--sucesso)"; icone = "<i class='fas fa-check-circle text-white'></i>"; 
+                } else { 
+                    status = "Incorreto (Errou)"; corStatusHex = "var(--perigo)"; icone = "<i class='fas fa-times-circle text-white'></i>"; 
+                }
+            }
+
+            let textColorForBadge = corStatusHex === "var(--secundaria)" ? "#000" : "#fff";
+            htmlGabarito += `
+            <div class="card mb-4 shadow-sm border-0" style="border-left: 6px solid ${corStatusHex} !important; border-radius: 12px; overflow: hidden;">
+                <div class="card-header py-3" style="background-color: var(--cinza-fundo); border-bottom: 1px solid var(--cinza-borda);">
+                    <span class="fw-bold" style="color: var(--cinza-texto);"><i class="fas fa-layer-group me-2" style="color: ${corStatusHex};"></i> Questão ${i+1}</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="text-secondary fw-bold mb-2 text-uppercase" style="font-size: 12px;"><i class="fas fa-user-edit me-1"></i> Sua Resposta</div>
+                            <div class="p-3 bg-light border rounded text-dark shadow-sm" style="min-height: 50px;">${respAluno || '<span class="text-muted fst-italic"><i class="fas fa-minus me-1"></i> Deixada em branco</span>'}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-bold mb-2 text-uppercase" style="color: var(--sucesso); font-size: 12px;"><i class="fas fa-check-double me-1"></i> Gabarito / Resposta Correta</div>
+                            <div class="p-3 border rounded text-dark shadow-sm" style="min-height: 50px; background-color: #F0FDF4; border-color: #BBF7D0 !important;">${respEsperadaParaExibir}</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-end">
+                        <span class="badge px-4 py-2 shadow-sm" style="background-color: ${corStatusHex}; color: ${textColorForBadge}; border-radius: 50px; font-size: 14px;">
+                            ${icone} ${status}
+                        </span>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+        document.getElementById('areaRelatorioCorrecao').innerHTML = htmlGabarito;
+        alternarTela('telaCorrecao');
     }
   </script>
 </body>
