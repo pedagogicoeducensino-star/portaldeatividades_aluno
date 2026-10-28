@@ -391,7 +391,7 @@
               </button>
             </div>
           </div>`;
-} else if(tipo === 'concluida') {
+      } else if(tipo === 'concluida') {
          let notaExibicao = 'Aguardando';
          
          if(ativ.nota) {
@@ -437,8 +437,23 @@
       alternarTela('telaInstrucoes');
     }
 
+    // =========================================================================
+    // HELPER: Verifica se uma resposta está realmente vazia no banco
+    // =========================================================================
+    function eRespostaVazia(resp) {
+        if (resp === null || resp === undefined || resp === "" || resp === "null" || resp === "undefined") return true;
+        if (typeof resp === 'string') {
+            let limpo = resp.replace(/,/g, '').trim();
+            if (limpo === "" || limpo === "null" || limpo === "undefined") return true;
+        }
+        return false;
+    }
+
+    // =========================================================================
+    // PREPARAR EXECUÇÃO: Carrega as pendentes e embaralha só elas
+    // =========================================================================
     function prepararExecucao() {
-      // 1. Salvar no servidor que começou
+      // 1. Notifica o servidor que o aluno iniciou/retomou
       fetch(URL_API_GOOGLE, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -450,59 +465,68 @@
           })
       }); 
 
-      // 2. Restaurar ou criar array de respostas garantindo o tamanho correto
-      if (cadernoAtivo.respostasSalvas && cadernoAtivo.respostasSalvas.length === cadernoAtivo.questoesOriginal.length) {
-          respostasAluno = [...cadernoAtivo.respostasSalvas];
-      } else {
-          respostasAluno = new Array(cadernoAtivo.questoesOriginal.length).fill(null);
-      }
-      
-      // 3. Criar a "Lista de Reprodução" original [0, 1, 2, 3...]
-      window.ordemExibicao = [];
-      for (let i = 0; i < cadernoAtivo.questoesOriginal.length; i++) {
-          window.ordemExibicao.push(i);
+      let totalQuestoes = cadernoAtivo.questoesOriginal.length;
+      respostasAluno = new Array(totalQuestoes).fill(null);
+
+      // 2. Restaura as respostas que o aluno já fez previamente
+      if (cadernoAtivo.respostasSalvas && Array.isArray(cadernoAtivo.respostasSalvas)) {
+          for (let i = 0; i < Math.min(cadernoAtivo.respostasSalvas.length, totalQuestoes); i++) {
+              let r = cadernoAtivo.respostasSalvas[i];
+              if (!eRespostaVazia(r)) {
+                  respostasAluno[i] = r; // Mantém a resposta amarrada ao índice original da prova
+              }
+          }
       }
 
-      // 4. Se embaralhar estiver ativado, embaralha APENAS a "Lista de Reprodução" (Playlist visual)
-      // O banco de dados e o array de respostas continuam fiéis às posições originais da sua planilha!
+      // 3. Monta a fila visual (ordemExibicao) contendo APENAS as questões pendentes
+      window.ordemExibicao = [];
+      for (let i = 0; i < totalQuestoes; i++) {
+          if (eRespostaVazia(respostasAluno[i])) {
+              window.ordemExibicao.push(i);
+          }
+      }
+
+      // Se o aluno já respondeu tudo e entrou de novo, recarrega a lista completa
+      if (window.ordemExibicao.length === 0) {
+          for (let i = 0; i < totalQuestoes; i++) {
+              window.ordemExibicao.push(i);
+          }
+      }
+
+      // 4. Embaralha APENAS a lista das questões pendentes (se a opção estiver ativa)
       if (cadernoAtivo.embaralhar) {
           window.ordemExibicao.sort(() => Math.random() - 0.5);
       }
-      
-      // 5. Encontrar qual é a próxima pergunta da playlist que ainda não foi respondida
+
       window.passoAtual = 0;
-      while (window.passoAtual < window.ordemExibicao.length) {
-          let indiceParaTestar = window.ordemExibicao[window.passoAtual];
-          if (respostasAluno[indiceParaTestar] === null || respostasAluno[indiceParaTestar] === "") {
-              break; // Achou uma questão vazia
-          }
-          window.passoAtual++;
-      }
-      
-      // Prevenção de erro caso o aluno tenha preenchido tudo
-      if (window.passoAtual >= window.ordemExibicao.length) {
-          window.passoAtual = 0; 
-      }
 
       alternarTela('telaExecucaoProva');
       renderizarQuestao();
     }
 
+    // =========================================================================
+    // RENDERIZAR QUESTÃO: Exibe o progresso real (ex: Questão 16 de 20)
+    // =========================================================================
     function renderizarQuestao() {
-      // Se terminou a playlist, envia
-      if(window.passoAtual >= window.ordemExibicao.length) { finalizarEEnviarProva(); return; }
+      if (window.passoAtual >= window.ordemExibicao.length) { 
+          finalizarEEnviarProva(); 
+          return; 
+      }
       
-      // Pega o número REAL da questão com base na Playlist
+      // Pega o número original da questão na planilha/caderno
       let indiceReal = window.ordemExibicao[window.passoAtual];
       const q = cadernoAtivo.questoesOriginal[indiceReal];
       tempoRestante = parseInt(q.tempo || 60);
       
-      let numAtual = window.passoAtual + 1; 
-      let totalQ = window.ordemExibicao.length; 
-      let pct = Math.round(((window.passoAtual) / totalQ) * 100);
+      // Exibição do progresso total de forma transparente para o aluno
+      let totalQuestoes = cadernoAtivo.questoesOriginal.length;
+      let jaRespondidas = respostasAluno.filter(r => !eRespostaVazia(r)).length;
+      let numAtualExibicao = jaRespondidas + 1;
+      let pct = Math.round((jaRespondidas / totalQuestoes) * 100);
       
-      document.getElementById('textoProgresso').innerText = 'Questão ' + numAtual + ' de ' + totalQ;
-      document.getElementById('percentualProgresso').innerText = pct + '%'; document.getElementById('barraProgresso').style.width = pct + '%';
+      document.getElementById('textoProgresso').innerText = 'Questão ' + numAtualExibicao + ' de ' + totalQuestoes;
+      document.getElementById('percentualProgresso').innerText = pct + '%'; 
+      document.getElementById('barraProgresso').style.width = pct + '%';
       
       let html = '<div class="p-4">';
       
@@ -510,7 +534,9 @@
           if (q.midia.includes('youtube.com') || q.midia.includes('youtu.be')) {
               let vid = q.midia.includes('v=') ? q.midia.split('v=')[1].split('&')[0] : q.midia.split('youtu.be/')[1].split('?')[0];
               html += `<div class="text-center mb-4"><iframe width="100%" height="315" src="https://www.youtube.com/embed/${vid}" frameborder="0" allowfullscreen class="rounded border shadow-sm"></iframe></div>`;
-          } else { html += `<div class="text-center mb-4"><img src="${q.midia}" class="img-fluid rounded border shadow-sm" style="max-height: 350px;"></div>`; }
+          } else { 
+              html += `<div class="text-center mb-4"><img src="${q.midia}" class="img-fluid rounded border shadow-sm" style="max-height: 350px;"></div>`; 
+          }
       }
 
       if(q.tipo === "estudo_caso") html += '<div class="estudo-caso-box shadow-sm">' + (q.contexto || "").replace(/\n/g, '<br>') + '</div>';
@@ -518,24 +544,37 @@
       if(q.tipo === "lacunas") {
         let enunciadoFmt = (q.enunciado || "").replace(/_{3,}/g, '<input type="text" class="form-control d-inline-block in-teste text-center input-box-destaque mx-1 shadow-sm" style="width:110px; height:35px;" oninput="verificarPreenchimento()">');
         html += '<p class="fw-bold mb-4 text-dark">' + enunciadoFmt + '</p>';
-      } else if(q.tipo !== "assercao_razao") { html += '<p class="fw-bold mb-4 text-dark" style="line-height: 1.5;">' + (q.enunciado || "") + '</p>'; }
+      } else if(q.tipo !== "assercao_razao") { 
+        html += '<p class="fw-bold mb-4 text-dark" style="line-height: 1.5;">' + (q.enunciado || "") + '</p>'; 
+      }
 
       if (q.tipo === "multipla_escolha") {
         ['A','B','C','D','E'].forEach(l => { 
-            if(q.opcoes && q.opcoes[l]) { html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3 mt-1" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; }
+            if(q.opcoes && q.opcoes[l]) { 
+                html += `<div class="form-check mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input ms-0 me-3 mt-1" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; 
+            }
         });
       } else if (q.tipo === "certo_errado") {
         html += `<div class="d-flex gap-4 mb-3"><div class="form-check p-3 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Certo" id="opt_C" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-success w-100" for="opt_C" style="cursor:pointer;">CERTO</label></div><div class="form-check p-3 bg-light rounded border w-50 text-center hover-shadow"><input class="form-check-input float-none ms-0 me-2" type="radio" name="respProva" value="Errado" id="opt_E" onclick="verificarPreenchimento()"><label class="form-check-label fw-bold text-danger w-100" for="opt_E" style="cursor:pointer;">ERRADO</label></div></div>`;
       } else if (q.tipo === "assercao_razao") {
         html += `<div class="bg-light p-4 rounded mb-4 border shadow-sm"><p class="mb-2 fw-bold">I. ${q.assercao}</p><div class="text-danger fw-bold my-3 text-center"><i class="fas fa-link"></i> PORQUE</div><p class="mb-0 fw-bold">II. ${q.razao}</p></div>`;
-        let assOpcoes = [ {v: "I", t: "I. A afirmação I é verdadeira, e a II é verdadeira, e a II justifica a I."}, {v: "II", t: "II. A afirmação I é verdadeira, e a II é verdadeira, mas a II não justifica a I."}, {v: "III", t: "III. A afirmação I é verdadeira, e a II é falsa."}, {v: "IV", t: "IV. A afirmação I é falsa, e a II é verdadeira."}, {v: "V", t: "V. A afirmação I é falsa, e a II é falsa."} ];
+        let assOpcoes = [ 
+          {v: "I", t: "I. A afirmação I é verdadeira, e a II é verdadeira, e a II justifica a I."}, 
+          {v: "II", t: "II. A afirmação I é verdadeira, e a II é verdadeira, mas a II não justifica a I."}, 
+          {v: "III", t: "III. A afirmação I é verdadeira, e a II é falsa."}, 
+          {v: "IV", t: "IV. A afirmação I é falsa, e a II é verdadeira."}, 
+          {v: "V", t: "V. A afirmação I é falsa, e a II é falsa."} 
+        ];
         assOpcoes.forEach(op => { html += `<div class="form-check mb-3 p-3 rounded bg-light border"><input class="form-check-input ms-1 me-3 mt-1" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`; });
       } else if (q.tipo === "associacao") {
-        html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`; (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm"><strong>${idx+1}.</strong> ${item}</div>`; }); html += `</div><div class="col-sm-7 ps-4">`;
+        html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4">`; 
+        (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm"><strong>${idx+1}.</strong> ${item}</div>`; }); 
+        html += `</div><div class="col-sm-7 ps-4">`;
         (q.colunaB || []).forEach((item, idx) => { 
           let dItem = (q.b_is_img && item.startsWith('http')) ? `<img src="${item}" class="rounded border" style="max-height:60px;">` : `<span class="fw-bold">${item}</span>`;
           html += `<div class="d-flex align-items-center mb-3 bg-white p-2 rounded border shadow-sm"><input type="text" class="form-control text-center in-teste input-box-destaque me-3 p-0" style="width:40px; height:40px;" oninput="verificarPreenchimento()">${dItem}</div>`; 
-        }); html += `</div></div>`;
+        }); 
+        html += `</div></div>`;
       } else if (q.tipo === "ordenacao") {
         q.lista.forEach((item, idx) => { html += `<div class="d-flex align-items-center mb-3 bg-light p-3 rounded border shadow-sm"><div style="width: 85%;" class="ps-2 fw-bold text-dark">${item}</div><div style="width: 15%;" class="text-end pe-2"><input type="text" class="form-control text-center in-teste input-box-destaque d-inline p-0" style="width:40px; height:40px;" oninput="verificarPreenchimento()"></div></div>`; });
       } else if (q.tipo === "verdadeiro_falso_mult") {
@@ -584,17 +623,8 @@
         inputs.forEach(inp => { if(inp.value.trim() === '') allFilled = false; });
         if(allFilled) respondeu = true; 
       }
-      
-      // Verifica se as perguntas RESTANTES da playlist já estão respondidas 
-      // (Isso impede que ele exija apertar "Próximo" eternamente se já respondeu as últimas na tentativa anterior)
-      let eUltima = true;
-      for (let i = window.passoAtual + 1; i < window.ordemExibicao.length; i++) {
-          let indiceParaTestar = window.ordemExibicao[i];
-          if (respostasAluno[indiceParaTestar] === null || respostasAluno[indiceParaTestar] === "") {
-              eUltima = false;
-              break;
-          }
-      }
+
+      let eUltima = (window.passoAtual === window.ordemExibicao.length - 1);
 
       const btn = document.getElementById('btnAvancar');
       if(respondeu || (radios.length === 0 && inputs.length === 0)) { 
@@ -609,37 +639,46 @@
       }
     }
 
+    // =========================================================================
+    // CAPTURAR RESPOSTA: Salva no índice exato da questão na prova
+    // =========================================================================
     function capturarRespostaAtual() {
+      if (window.passoAtual >= window.ordemExibicao.length) return;
+      
       let indiceReal = window.ordemExibicao[window.passoAtual];
       const q = cadernoAtivo.questoesOriginal[indiceReal];
       
       if(["multipla_escolha", "certo_errado", "assercao_razao"].includes(q.tipo)) {
         const rad = document.querySelector('input[name="respProva"]:checked');
-        if(rad) respostasAluno[indiceReal] = rad.value;
+        if(rad) {
+            respostasAluno[indiceReal] = rad.value;
+        }
       } else {
         const inputs = document.querySelectorAll('.in-teste');
         if(inputs.length > 0) {
-            let vals = []; inputs.forEach(i => vals.push(i.value.trim().toUpperCase()));
-            respostasAluno[indiceReal] = vals.join(", ");
+            let vals = []; 
+            inputs.forEach(i => vals.push(i.value.trim().toUpperCase()));
+            let textoResp = vals.join(", ");
+            if (!eRespostaVazia(textoResp)) {
+                respostasAluno[indiceReal] = textoResp;
+            }
         }
       }
     }
 
+    // =========================================================================
+    // AVANÇAR QUESTEÃO E PAUSAR/GUARDAR
+    // =========================================================================
     function avancarQuestao() {
       capturarRespostaAtual();
       
       window.passoAtual++; 
       
-      // Magia: pula direto para a próxima questão não respondida se ele pausou/voltou!
-      while (window.passoAtual < window.ordemExibicao.length) {
-          let indiceParaTestar = window.ordemExibicao[window.passoAtual];
-          if (respostasAluno[indiceParaTestar] === null || respostasAluno[indiceParaTestar] === "") {
-              break;
-          }
-          window.passoAtual++;
+      if (window.passoAtual >= window.ordemExibicao.length) {
+          finalizarEEnviarProva();
+      } else {
+          renderizarQuestao();
       }
-      
-      renderizarQuestao();
     }
 
     function pausarEGuardar() {
@@ -655,7 +694,9 @@
       }).then((result) => {
           if(result.isConfirmed) {
               clearInterval(timerIntervalo);
-              capturarRespostaAtual(); 
+              
+              // Captura a questão atual se o aluno respondeu
+              capturarRespostaAtual();
               
               Swal.fire({ title: 'Salvando no servidor...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
@@ -666,7 +707,11 @@
                   tempoRestante: tempoRestante
               };
 
-              fetch(URL_API_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(pacoteEnvio) })
+              fetch(URL_API_GOOGLE, { 
+                  method: 'POST', 
+                  headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                  body: JSON.stringify(pacoteEnvio) 
+              })
               .then(res => res.json()).then(resp => {
                   Swal.fire('Salvo!', 'Você já pode sair. Suas respostas estão seguras.', 'success').then(() => {
                       alternarTela('telaDashboard');
