@@ -54,6 +54,16 @@
     .box-info { background-color: #FFFBEB; border-left: 5px solid var(--secundaria); padding: 20px; border-radius: 12px; color: var(--marrom-suave); margin-bottom: 24px;}
     
     .noselect { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+
+    /* ======================================================= */
+    /* CORREÇÃO PARA MANTER OS PARÁGRAFOS E QUEBRAS DE LINHA   */
+    /* ======================================================= */
+    p.fw-bold.text-dark,
+    .preview-questao p.fw-bold,
+    .estudo-caso-box,
+    .card-body .p-3.border.rounded {
+        white-space: pre-wrap !important;
+    }
   </style>
 </head>
 <body>
