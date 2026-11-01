@@ -298,7 +298,7 @@
       document.getElementById('textoSaudacao').innerHTML = `${cumprimento}, <strong style="color: var(--primaria);">${nome}</strong>! 🚀`;
     }
 
-    function fazerLoginAluno() {
+function fazerLoginAluno() {
       const matricula = document.getElementById('inputMatricula').value.trim();
       if(!matricula) return;
 
@@ -312,12 +312,22 @@
           btn.innerHTML = 'Acessar Portal <i class="fas fa-rocket ms-2"></i>';
           btn.disabled = false;
           if(resp.sucesso) {
+            
+            // REGISTRO DE ACESSO: Envia para o servidor que o aluno fez login
+            fetch(URL_API_GOOGLE, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ api: 'registrarAcesso', matricula: matricula, acao: 'Fez login no portal' }) 
+            });
+
             dadosAluno = { matricula: matricula, nome: resp.nome };
             localStorage.setItem('alunoLogado_LMS', JSON.stringify(dadosAluno));
             montarSaudacao(resp.nome);
             alternarTela('telaDashboard');
             carregarAtividadesPendentes();
-          } else { Swal.fire('Acesso Negado', resp.msg, 'error'); }
+          } else { 
+            Swal.fire('Acesso Negado', resp.msg, 'error'); 
+          }
         }).catch(err => {
           btn.innerHTML = 'Acessar Portal <i class="fas fa-rocket ms-2"></i>';
           btn.disabled = false;
