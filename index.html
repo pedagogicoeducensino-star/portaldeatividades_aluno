@@ -283,7 +283,21 @@
       document.getElementById(idTela).classList.remove('escondido');
     }
 
-    function sair() {
+function sair() {
+      // Registra que o aluno clicou no botão sair
+      if (dadosAluno && dadosAluno.matricula) {
+          fetch(URL_API_GOOGLE, { 
+              method: 'POST', 
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              keepalive: true, // Garante que envie antes da tela piscar
+              body: JSON.stringify({ 
+                  api: 'registrarAcesso', 
+                  matricula: dadosAluno.matricula, 
+                  acao: 'Saiu do portal (Logout)',
+                  dataHora: new Date().toLocaleString('pt-BR')
+              }) 
+          });
+      }
       dadosAluno = null;
       localStorage.removeItem('alunoLogado_LMS');
       document.getElementById('inputMatricula').value = "";
@@ -298,7 +312,24 @@
       document.getElementById('textoSaudacao').innerHTML = `${cumprimento}, <strong style="color: var(--primaria);">${nome}</strong>! 🚀`;
     }
 
-function fazerLoginAluno() {
+// Registra se o aluno fechar a aba no X ou fechar o navegador
+    window.addEventListener('beforeunload', function (e) {
+        if (dadosAluno && dadosAluno.matricula) {
+            fetch(URL_API_GOOGLE, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                keepalive: true, // Força o navegador a enviar antes de fechar a aba
+                body: JSON.stringify({ 
+                    api: 'registrarAcesso', 
+                    matricula: dadosAluno.matricula, 
+                    acao: 'Fechou o navegador / saiu no X',
+                    dataHora: new Date().toLocaleString('pt-BR')
+                }) 
+            });
+        }
+    });
+
+    function fazerLoginAluno() {
       const matricula = document.getElementById('inputMatricula').value.trim();
       if(!matricula) return;
 
@@ -313,11 +344,16 @@ function fazerLoginAluno() {
           btn.disabled = false;
           if(resp.sucesso) {
             
-            // REGISTRO DE ACESSO: Envia para o servidor que o aluno fez login
+            // REGISTRO DE ACESSO: Envia para o servidor que o aluno fez login com Data e Hora
             fetch(URL_API_GOOGLE, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify({ api: 'registrarAcesso', matricula: matricula, acao: 'Fez login no portal' }) 
+                body: JSON.stringify({ 
+                    api: 'registrarAcesso', 
+                    matricula: matricula, 
+                    acao: 'Fez login no portal',
+                    dataHora: new Date().toLocaleString('pt-BR')
+                }) 
             });
 
             dadosAluno = { matricula: matricula, nome: resp.nome };
@@ -334,7 +370,7 @@ function fazerLoginAluno() {
           Swal.fire('Erro', 'Falha na rede.', 'error');
         });
     }
-
+    
     function carregarAtividadesPendentes() {
       const containerEmAndamento = document.getElementById('listaEmAndamento');
       const containerPendentes = document.getElementById('listaPendentes');
@@ -445,10 +481,24 @@ function fazerLoginAluno() {
       }
     }
 
-    function abrirInstrucoes(linhaPlanilha) {
+function abrirInstrucoes(linhaPlanilha) {
       let pendentes = [...painelCompleto.a_fazer, ...painelCompleto.em_andamento];
       cadernoAtivo = pendentes.find(p => p.linhaPlanilha === linhaPlanilha);
       if(!cadernoAtivo || !cadernoAtivo.questoesOriginal || cadernoAtivo.questoesOriginal.length === 0) { Swal.fire('Atenção', 'Questões indisponíveis.', 'warning'); return; }
+
+      // Registra qual atividade exata o aluno abriu
+      if (dadosAluno && dadosAluno.matricula) {
+          fetch(URL_API_GOOGLE, { 
+              method: 'POST', 
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+              body: JSON.stringify({ 
+                  api: 'registrarAcesso', 
+                  matricula: dadosAluno.matricula, 
+                  acao: 'Acessou a atividade: ' + cadernoAtivo.titulo,
+                  dataHora: new Date().toLocaleString('pt-BR')
+              }) 
+          });
+      }
 
       document.getElementById('infoTituloProva').innerText = cadernoAtivo.titulo;
       document.getElementById('infoQtdQuestoes').innerText = cadernoAtivo.questoesOriginal.length;
