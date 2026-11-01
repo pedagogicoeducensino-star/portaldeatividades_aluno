@@ -23,14 +23,11 @@
       --cinza-borda: #E2E8F0;
       --sucesso: #10B981;
       --perigo: #EF4444;
-      
-      /* MUDE O TAMANHO DA FONTE AQUI SE ACHAR NECESSÁRIO (Padrão Coordenação: 15px) */
       --fonte-padrao: 15px; 
     }
     
     body { background-color: var(--cinza-fundo); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--cinza-texto); font-size: var(--fonte-padrao); line-height: 1.6; }
     
-    /* Removemos tamanhos gigantes das classes do bootstrap para respeitar nossa fonte padrão */
     .fs-1, .fs-2, .fs-3, .fs-4, .fs-5, .fs-6 { font-size: var(--fonte-padrao) !important; }
     h2, h4, h5 { font-size: 18px !important; font-weight: 700; }
     h2.titulo-grande { font-size: 24px !important; }
@@ -55,25 +52,19 @@
     
     .noselect { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
 
-    /* ======================================================= */
-    /* CORREÇÃO PARA MANTER OS PARÁGRAFOS E QUEBRAS DE LINHA   */
-    /* ======================================================= */
-    p.fw-bold.text-dark,
-    .preview-questao p.fw-bold,
-    .estudo-caso-box,
-    .card-body .p-3.border.rounded {
+    p.fw-bold.text-dark, .preview-questao p.fw-bold, .estudo-caso-box, .card-body .p-3.border.rounded {
         white-space: pre-wrap !important;
     }
   </style>
 </head>
 <body>
 
-  <!-- TELA DE LOGIN DO ALUNO -->
+  <!-- TELA DE LOGIN -->
   <div id="telaLogin" class="card-3d card-topo-laranja mx-auto shadow" style="max-width: 450px; margin-top: 12vh;">
     <div class="text-center mb-4">
       <div class="mb-3"><i class="fas fa-user-astronaut" style="font-size: 45px; color: var(--primaria);"></i></div>
-      <h2 class="titulo-grande fw-bold mb-1" style="color: var(--marrom-suave);">Portal de Atividades do Aluno</h2>
-      <p class="text-muted">Digite sua Matrícula para acessar suas Atividades</p>
+      <h2 class="titulo-grande fw-bold mb-1" style="color: var(--marrom-suave);">Portal de Atividades</h2>
+      <p class="text-muted">Digite sua Matrícula para acessar</p>
     </div>
     <div class="mb-4">
       <label class="form-label fw-bold" style="color: var(--cinza-texto);">Nº da Matrícula:</label>
@@ -85,8 +76,7 @@
     <button class="btn btn-primario w-100" onclick="fazerLoginAluno()" id="btnLogin">Acessar Portal <i class="fas fa-rocket ms-2"></i></button>
   </div>
 
-  <!-- TELA DASHBOARD (ATIVIDADES) -->
-  <!-- MUDE A LARGURA DO SITE AQUI EM BAIXO (max-width) -->
+  <!-- DASHBOARD -->
   <div id="telaDashboard" class="container py-4 escondido" style="max-width: 1200px;">
     <div class="d-flex justify-content-between align-items-center mb-4 card-3d card-topo-amarelo py-4" style="background: linear-gradient(to right, #ffffff, #FFFBEB);">
       <div class="d-flex align-items-center gap-4">
@@ -95,63 +85,47 @@
         </div>
         <div>
           <h2 class="titulo-grande mb-1 fw-bold text-dark" id="textoSaudacao">Olá!</h2>
-          <span class="text-muted">🔥 Você aprendeu. Agora é hora de mostrar! Confie no seu conhecimento, faça com atenção e dê o seu melhor.</span>
+          <span class="text-muted">🔥 Você aprendeu. Agora é hora de mostrar!</span>
         </div>
       </div>
       <button class="btn btn-outline-danger fw-bold shadow-sm rounded-pill px-4 py-2" onclick="sair()"><i class="fas fa-power-off me-2"></i> Sair</button>
     </div>
 
-    <!-- SESSÃO 1: EM ANDAMENTO -->
     <div class="card-3d mb-4" style="border-top: none;" id="sessaoEmAndamento">
       <h4 class="mb-4 fw-bold" style="color: var(--marrom-suave);"><i class="fas fa-play-circle me-2" style="color: var(--secundaria);"></i> Continue de onde parou</h4>
       <div id="listaEmAndamento" class="row g-4"></div>
     </div>
 
-    <!-- SESSÃO 2: PENDENTES (A FAZER / LIBERADAS) -->
     <div class="card-3d mb-4" style="border-top: none;" id="sessaoPendentes">
-      <h4 class="mb-4 fw-bold" style="color: var(--marrom-suave);"><i class="fas fa-clipboard-list me-2" style="color: var(--primaria);"></i> Novas Atividades Pendentes</h4>
+      <h4 class="mb-4 fw-bold" style="color: var(--marrom-suave);"><i class="fas fa-clipboard-list me-2" style="color: var(--primaria);"></i> Novas Atividades</h4>
       <div id="listaPendentes" class="row g-4"></div>
     </div>
 
-    <!-- SESSÃO 3: BLOQUEADAS (NOVIDADE) -->
     <div class="card-3d mb-4" style="border-top: none; background-color: #F8FAFC;" id="sessaoBloqueadas">
       <h4 class="mb-4 fw-bold text-muted"><i class="fas fa-lock me-2"></i> Próximas Atividades (Bloqueadas)</h4>
       <div id="listaBloqueadas" class="row g-4"></div>
     </div>
 
-    <!-- SESSÃO 4: CONCLUÍDAS (BOLETIM) -->
     <div class="card-3d" style="border-top: none; background-color: #F8FAFC;" id="sessaoConcluidas">
       <h4 class="mb-4 fw-bold text-dark"><i class="fas fa-award me-2" style="color: var(--sucesso);"></i> Atividades Finalizadas</h4>
       <div id="listaConcluidas" class="row g-4"></div>
     </div>
   </div>
 
-  <!-- TELA DE INSTRUÇÕES (PRÉ-PROVA) -->
+  <!-- TELA INSTRUÇÕES -->
   <div id="telaInstrucoes" class="container py-5 escondido" style="max-width: 1000px;">
     <div class="card-3d card-topo-laranja text-center p-5">
        <i class="fas fa-bullhorn mb-3" style="font-size: 45px; color: var(--secundaria);"></i>
        <h2 class="titulo-grande fw-bold mb-4 text-dark" id="infoTituloProva">Título da Prova</h2>
-       
        <div class="text-start mb-4 p-4 rounded shadow-sm" style="background-color: #FFFBEB; border: 1px solid var(--secundaria);">
            <h5 class="fw-bold text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i> ATENÇÃO!</h5>
-           <p class="fw-bold text-dark mb-4">Antes de iniciar, leia as orientações:</p>
-           
            <ul class="list-unstyled text-dark mb-4" style="line-height: 1.7;">
-               <li class="mb-2">⏱️ <strong>Tempo:</strong> cada questão possui um tempo mínimo. Você pode ultrapassá-lo, mas não poderá avançar antes do término.</li>
-               <li class="mb-2">🚫 <strong>Não copie e cole:</strong> as respostas devem ser elaboradas pelo próprio aluno.</li>
-               <li class="mb-2">📚 <strong>Material:</strong> utilize sua apostila como apoio. Caso não tenha recebido, procure a Secretaria.</li>
-               <li class="mb-2">📵 <strong>Celular e outras fontes:</strong> não é aconselhável utilizá-los para responder à atividade. O objetivo é aperfeiçoar e verificar seus conhecimentos.</li>
-               <li class="mb-2">💾 <strong>Salve sua atividade:</strong> se não concluir durante a aula, salve antes de sair para continuar posteriormente.</li>
-               <li class="mb-2">👨‍🏫 <strong>Dúvidas:</strong> chame o(a) professor(a) em sala para receber orientação.</li>
+               <li class="mb-2">⏱️ <strong>Tempo:</strong> cada questão possui um tempo mínimo.</li>
+               <li class="mb-2">🚫 <strong>Não copie e cole:</strong> bloqueado pelo sistema.</li>
+               <li class="mb-2">💾 <strong>Salve sua atividade:</strong> se não concluir, salve para continuar depois.</li>
            </ul>
-           
-           <div class="p-3 text-center rounded fw-bold shadow-sm" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">
-              Boa atividade! Faça com atenção e confiança no que você aprendeu.
-           </div>
        </div>
-       
        <h5 class="mb-4">Total de Questões: <strong id="infoQtdQuestoes" style="color: var(--primaria);">0</strong></h5>
-       
        <div class="d-flex justify-content-center gap-3">
           <button class="btn btn-secondary rounded-pill px-4" onclick="alternarTela('telaDashboard')"><i class="fas fa-arrow-left me-2"></i> Voltar</button>
           <button class="btn btn-primario rounded-pill px-5" onclick="prepararExecucao()"><i class="fas fa-flag-checkered me-2"></i> Estou Ciente, Começar!</button>
@@ -159,8 +133,7 @@
     </div>
   </div>
 
-  <!-- TELA DE EXECUÇÃO DA PROVA -->
-  <!-- MUDE A LARGURA DA PROVA AQUI EM BAIXO (max-width) -->
+  <!-- EXECUÇÃO DA PROVA -->
   <div id="telaExecucaoProva" class="container py-4 escondido noselect" style="max-width: 1100px;">
     <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-pill shadow-sm border">
         <div class="ms-3 fw-bold text-dark"><i class="fas fa-book-open me-2" style="color: var(--primaria);"></i> <span id="tituloProvaExecucao">Atividade</span></div>
@@ -168,10 +141,8 @@
             <i class="fas fa-save me-1"></i> Salvar e Sair
         </button>
     </div>
-
     <div class="mb-4 text-center">
       <div class="relogio-teste mx-auto mb-4" id="relogioTeste"><i class="fas fa-stopwatch"></i> 0s</div>
-      
       <div class="d-flex justify-content-between align-items-end mb-2 px-2">
         <span class="fw-bold text-secondary" id="textoProgresso">Questão 1 de X</span>
         <span class="fw-bold" style="color: var(--primaria);" id="percentualProgresso">0%</span>
@@ -180,11 +151,7 @@
         <div id="barraProgresso" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
       </div>
     </div>
-
-    <div id="areaQuestaoAtiva" class="card-3d shadow mb-4" style="border-top-width: 6px; border-top-color: var(--secundaria); min-height: 300px;">
-      <!-- HTML da Questão Injetado Aqui -->
-    </div>
-
+    <div id="areaQuestaoAtiva" class="card-3d shadow mb-4" style="border-top-width: 6px; border-top-color: var(--secundaria); min-height: 300px;"></div>
     <div class="text-center mt-4 pb-5">
       <button id="btnAvancar" class="btn btn-secondary w-100 shadow fw-bold mb-3" disabled onclick="avancarQuestao()" style="padding: 14px; border-radius: 12px;">
         Aguarde o tempo...
@@ -192,32 +159,21 @@
     </div>
   </div>
 
-  <!-- TELA DE CORREÇÃO (GABARITO DO ALUNO) -->
+  <!-- CORREÇÃO -->
   <div id="telaCorrecao" class="container py-4 escondido" style="max-width: 900px;">
     <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border">
         <div class="ms-2 fw-bold text-dark fs-5"><i class="fas fa-check-double me-2" style="color: var(--sucesso);"></i> Correção Detalhada</div>
         <button class="btn btn-sm btn-outline-secondary fw-bold rounded-pill px-3 py-2" onclick="alternarTela('telaDashboard')">
-            <i class="fas fa-arrow-left me-1"></i> Voltar ao Boletim
+            <i class="fas fa-arrow-left me-1"></i> Voltar
         </button>
     </div>
-    
-    <div class="alert alert-info border-0 shadow-sm mb-4" style="background-color: #F0F9FF; color: #0369A1;">
-        <i class="fas fa-info-circle me-2"></i> <strong>Atenção:</strong> Nas questões discursivas, sua resposta não precisa ser idêntica ao gabarito esperado. O sistema avalia se você abordou os conceitos principais.
-    </div>
-
-    <div id="areaRelatorioCorrecao">
-        <!-- Preenchido via JS -->
-    </div>
-    
+    <div id="areaRelatorioCorrecao"></div>
     <div class="text-center mt-4 pb-5">
-       <button class="btn btn-primario fw-bold shadow px-5 py-3 rounded-pill" onclick="alternarTela('telaDashboard')"><i class="fas fa-arrow-left me-2"></i> Voltar ao Painel Principal</button>
+       <button class="btn btn-primario fw-bold shadow px-5 py-3 rounded-pill" onclick="alternarTela('telaDashboard')"><i class="fas fa-arrow-left me-2"></i> Voltar ao Painel</button>
     </div>
   </div>
   
   <script>
-    // =========================================================================
-    // COLE AQUI A SUA URL DO GOOGLE APPS SCRIPT
-    // =========================================================================
     const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzEjn_R54vUXpglydH_z669p53Smxw84wt7gm9KPdQSlp5rMHovbxb7-pq7MSWv6Mfd/exec";
     
     let dadosAluno = null;
@@ -226,12 +182,35 @@
     let respostasAluno = [];
     let tempoRestante = 0;
     let timerIntervalo = null;
-    
-    // SISTEMA DE MAPEAMENTO E EMBARALHAMENTO SEGURO
     let ordemExibicao = [];
     let passoAtual = 0;
 
-    // BLOQUEIOS ANTI-COLA E MUDANÇA DE ABA
+    // =========================================================================
+    // NOVO: SISTEMA DE RASTREIO DE SESSÃO SILENCIOSO
+    // =========================================================================
+    function registrarLogSilencioso(acao) {
+        if (!dadosAluno || !dadosAluno.matricula) return;
+        
+        let pacote = {
+            api: 'registrarLogSessao',
+            matricula: dadosAluno.matricula,
+            acao: acao,
+            dataHora: new Date().toLocaleString('pt-BR')
+        };
+        
+        // sendBeacon garante que os dados sejam enviados ao Google mesmo se a aba fechar subitamente
+        let blob = new Blob([JSON.stringify(pacote)], {type: 'text/plain;charset=utf-8'});
+        navigator.sendBeacon(URL_API_GOOGLE, blob);
+    }
+
+    // Gatilho: Quando o aluno tenta fechar o navegador ou a aba no "X"
+    window.addEventListener('beforeunload', function (e) {
+        if (dadosAluno && dadosAluno.matricula) {
+            registrarLogSilencioso('FECHOU_ABA_OU_NAVEGADOR');
+        }
+    });
+    // =========================================================================
+
     document.addEventListener('copy', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
     document.addEventListener('cut', function(e) { if (!document.getElementById('telaExecucaoProva').classList.contains('escondido')) e.preventDefault(); });
     document.addEventListener('paste', function(e) { 
@@ -243,7 +222,6 @@
     document.addEventListener("visibilitychange", () => {
         if (document.hidden && !document.getElementById('telaExecucaoProva').classList.contains('escondido')) {
              clearInterval(timerIntervalo);
-             
              Swal.fire({
                 title: '⚠️ ALERTA DE FOCO!',
                 html: 'Você saiu da aba da atividade.<br><br>Como regra de segurança, <b>o tempo desta questão foi reiniciado</b>. Mantenha o foco até concluir!',
@@ -283,7 +261,9 @@
       document.getElementById(idTela).classList.remove('escondido');
     }
 
+    // ALTERAÇÃO: Registrar saída antes de apagar os dados do aluno
     function sair() {
+      registrarLogSilencioso('SAIDA_VOLUNTARIA'); // <--- LOG DE SAÍDA
       dadosAluno = null;
       localStorage.removeItem('alunoLogado_LMS');
       document.getElementById('inputMatricula').value = "";
@@ -298,6 +278,7 @@
       document.getElementById('textoSaudacao').innerHTML = `${cumprimento}, <strong style="color: var(--primaria);">${nome}</strong>! 🚀`;
     }
 
+    // ALTERAÇÃO: Registrar entrada ao efetuar login com sucesso
     function fazerLoginAluno() {
       const matricula = document.getElementById('inputMatricula').value.trim();
       if(!matricula) return;
@@ -315,6 +296,9 @@
             dadosAluno = { matricula: matricula, nome: resp.nome };
             localStorage.setItem('alunoLogado_LMS', JSON.stringify(dadosAluno));
             montarSaudacao(resp.nome);
+            
+            registrarLogSilencioso('ENTRADA'); // <--- LOG DE ENTRADA
+            
             alternarTela('telaDashboard');
             carregarAtividadesPendentes();
           } else { Swal.fire('Acesso Negado', resp.msg, 'error'); }
@@ -337,7 +321,6 @@
         .then(res => res.json())
         .then(painel => {
           painelCompleto = painel;
-          
           containerEmAndamento.innerHTML = ''; containerPendentes.innerHTML = ''; 
           containerConcluidas.innerHTML = ''; containerBloqueadas.innerHTML = '';
 
@@ -351,7 +334,6 @@
              painel.a_fazer.forEach(ativ => containerPendentes.innerHTML += gerarCardHTML(ativ, 'fazer'));
           } else { containerPendentes.innerHTML = '<div class="col-12 text-center text-muted py-4 bg-white rounded border"><i class="fas fa-mug-hot mb-2 opacity-50" style="font-size: 30px;"></i><br>Nenhuma atividade pendente no momento!</div>'; }
 
-          // SESSÃO DE BLOQUEADAS
           document.getElementById('sessaoBloqueadas').classList.remove('escondido');
           if(painel.bloqueadas && painel.bloqueadas.length > 0) {
              painel.bloqueadas.forEach(ativ => containerBloqueadas.innerHTML += gerarCardHTML(ativ, 'bloqueada'));
@@ -369,69 +351,22 @@
       let prazoTxt = ativ.prazo ? ativ.prazo : 'Sem prazo';
       
       if(tipo === 'andamento') {
-         return `
-          <div class="col-md-6">
-            <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--secundaria);">
-              <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
-              <button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave); padding: 10px;" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
-                 <i class="fas fa-play me-2"></i> Continuar Atividade
-              </button>
-            </div>
-          </div>`;
+         return `<div class="col-md-6"><div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--secundaria);"><h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5><div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div><button class="btn w-100 fw-bold mt-auto" style="background-color: var(--secundaria); color: var(--marrom-suave); padding: 10px;" onclick="abrirInstrucoes(${ativ.linhaPlanilha})"><i class="fas fa-play me-2"></i> Continuar Atividade</button></div></div>`;
       } else if(tipo === 'fazer') {
-         return `
-          <div class="col-md-6">
-            <div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--primaria);">
-              <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
-              <button class="btn btn-primario w-100 fw-bold mt-auto py-2" onclick="abrirInstrucoes(${ativ.linhaPlanilha})">
-                 <i class="fas fa-pen me-2"></i> Iniciar Agora
-              </button>
-            </div>
-          </div>`;
+         return `<div class="col-md-6"><div class="p-4 bg-white border rounded shadow-sm hover-shadow h-100" style="border-left: 5px solid var(--primaria);"><h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5><div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div><button class="btn btn-primario w-100 fw-bold mt-auto py-2" onclick="abrirInstrucoes(${ativ.linhaPlanilha})"><i class="fas fa-pen me-2"></i> Iniciar Agora</button></div></div>`;
       } else if(tipo === 'bloqueada') {
-         return `
-          <div class="col-md-6">
-            <div class="p-4 bg-light border rounded shadow-sm h-100" style="border-left: 5px solid #94A3B8; opacity: 0.8;">
-              <h5 class="fw-bold text-muted mb-3"><i class="fas fa-lock me-2"></i> ${ativ.titulo}</h5>
-              <div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div>
-              <button class="btn btn-secondary w-100 fw-bold mt-auto py-2" disabled>
-                 <i class="fas fa-lock me-2"></i> Aguardando Liberação
-              </button>
-            </div>
-          </div>`;
+         return `<div class="col-md-6"><div class="p-4 bg-light border rounded shadow-sm h-100" style="border-left: 5px solid #94A3B8; opacity: 0.8;"><h5 class="fw-bold text-muted mb-3"><i class="fas fa-lock me-2"></i> ${ativ.titulo}</h5><div class="mb-4 small text-muted"><i class="far fa-clock"></i> Prazo: ${prazoTxt} &nbsp;|&nbsp; <i class="fas fa-list-ol"></i> Questões: ${qtdQ}</div><button class="btn btn-secondary w-100 fw-bold mt-auto py-2" disabled><i class="fas fa-lock me-2"></i> Aguardando Liberação</button></div></div>`;
       } else if(tipo === 'concluida') {
-         let notaExibicao = 'Aguardando';
-         
-         if(ativ.nota) {
-             if(ativ.nota.includes("|")) {
-                 // Novo formato recebido: "Nota|Acertos/Total" (Ex: "4.6|4.6/10")
-                 let proporcao = ativ.nota.split("|")[1]; 
-                 let acertos = parseFloat(proporcao.split("/")[0]);
-                 let totalQuestoes = parseFloat(proporcao.split("/")[1]);
-                 
-                 // Calcula a percentagem exata
-                 let percentual = Math.round((acertos / totalQuestoes) * 100);
-                 notaExibicao = percentual + "% de Acertos";
-             } else if (ativ.nota.includes("%")) {
-                 // Caso existam provas antigas gravadas com o formato "60% (8 pts)"
-                 notaExibicao = ativ.nota.split("(")[0].trim(); 
-             } else {
-                 notaExibicao = ativ.nota;
-             }
+         let notaExibicao = ativ.nota || 'Aguardando';
+         if(notaExibicao.includes("|")) {
+             let proporcao = notaExibicao.split("|")[1]; 
+             let acertos = parseFloat(proporcao.split("/")[0]);
+             let totalQuestoes = parseFloat(proporcao.split("/")[1]);
+             notaExibicao = Math.round((acertos / totalQuestoes) * 100) + "% de Acertos";
+         } else if (notaExibicao.includes("%")) {
+             notaExibicao = notaExibicao.split("(")[0].trim(); 
          }
-
-         return `
-          <div class="col-md-6">
-            <div class="p-4 bg-white border rounded shadow-sm h-100 d-flex flex-column" style="border-left: 5px solid var(--sucesso); opacity: 0.9;">
-              <h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5>
-              <div class="p-3 text-center rounded fw-bold mb-3" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Desempenho: ${notaExibicao}</div>
-              <button class="btn btn-outline-success w-100 fw-bold mt-auto py-2" onclick="abrirCorrecao(${ativ.linhaPlanilha})">
-                 <i class="fas fa-search-plus me-2"></i> Ver Correção e Gabaritos
-              </button>
-            </div>
-          </div>`;
+         return `<div class="col-md-6"><div class="p-4 bg-white border rounded shadow-sm h-100 d-flex flex-column" style="border-left: 5px solid var(--sucesso); opacity: 0.9;"><h5 class="fw-bold text-dark mb-3">${ativ.titulo}</h5><div class="p-3 text-center rounded fw-bold mb-3" style="background-color: #ECFDF5; color: #047857; border: 1px dashed #10B981;">Desempenho: ${notaExibicao}</div><button class="btn btn-outline-success w-100 fw-bold mt-auto py-2" onclick="abrirCorrecao(${ativ.linhaPlanilha})"><i class="fas fa-search-plus me-2"></i> Ver Correção e Gabaritos</button></div></div>`;
       }
     }
 
@@ -443,13 +378,9 @@
       document.getElementById('infoTituloProva').innerText = cadernoAtivo.titulo;
       document.getElementById('infoQtdQuestoes').innerText = cadernoAtivo.questoesOriginal.length;
       document.getElementById('tituloProvaExecucao').innerText = cadernoAtivo.titulo;
-      
       alternarTela('telaInstrucoes');
     }
 
-    // =========================================================================
-    // HELPER: Verifica se uma resposta está realmente vazia no banco
-    // =========================================================================
     function eRespostaVazia(resp) {
         if (resp === null || resp === undefined || resp === "" || resp === "null" || resp === "undefined") return true;
         if (typeof resp === 'string') {
@@ -459,76 +390,46 @@
         return false;
     }
 
-    // =========================================================================
-    // PREPARAR EXECUÇÃO: Carrega as pendentes e embaralha só elas
-    // =========================================================================
     function prepararExecucao() {
-      // 1. Notifica o servidor que o aluno iniciou/retomou
       fetch(URL_API_GOOGLE, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-              api: 'salvarProgresso',
-              linhaPlanilha: cadernoAtivo.linhaPlanilha,
-              respostas: cadernoAtivo.respostasSalvas || [], 
-              tempoRestante: 0 
-          })
+          body: JSON.stringify({ api: 'salvarProgresso', linhaPlanilha: cadernoAtivo.linhaPlanilha, respostas: cadernoAtivo.respostasSalvas || [], tempoRestante: 0 })
       }); 
 
       let totalQuestoes = cadernoAtivo.questoesOriginal.length;
       respostasAluno = new Array(totalQuestoes).fill(null);
 
-      // 2. Restaura as respostas que o aluno já fez previamente
       if (cadernoAtivo.respostasSalvas && Array.isArray(cadernoAtivo.respostasSalvas)) {
           for (let i = 0; i < Math.min(cadernoAtivo.respostasSalvas.length, totalQuestoes); i++) {
               let r = cadernoAtivo.respostasSalvas[i];
-              if (!eRespostaVazia(r)) {
-                  respostasAluno[i] = r; // Mantém a resposta amarrada ao índice original da prova
-              }
+              if (!eRespostaVazia(r)) respostasAluno[i] = r; 
           }
       }
 
-      // 3. Monta a fila visual (ordemExibicao) contendo APENAS as questões pendentes
       window.ordemExibicao = [];
       for (let i = 0; i < totalQuestoes; i++) {
-          if (eRespostaVazia(respostasAluno[i])) {
-              window.ordemExibicao.push(i);
-          }
+          if (eRespostaVazia(respostasAluno[i])) window.ordemExibicao.push(i);
       }
 
-      // Se o aluno já respondeu tudo e entrou de novo, recarrega a lista completa
       if (window.ordemExibicao.length === 0) {
-          for (let i = 0; i < totalQuestoes; i++) {
-              window.ordemExibicao.push(i);
-          }
+          for (let i = 0; i < totalQuestoes; i++) window.ordemExibicao.push(i);
       }
 
-      // 4. Embaralha APENAS a lista das questões pendentes (se a opção estiver ativa)
-      if (cadernoAtivo.embaralhar) {
-          window.ordemExibicao.sort(() => Math.random() - 0.5);
-      }
+      if (cadernoAtivo.embaralhar) window.ordemExibicao.sort(() => Math.random() - 0.5);
 
       window.passoAtual = 0;
-
       alternarTela('telaExecucaoProva');
       renderizarQuestao();
     }
 
-    // =========================================================================
-    // RENDERIZAR QUESTÃO: Exibe o progresso real (ex: Questão 16 de 20)
-    // =========================================================================
-function renderizarQuestao() {
-      if (window.passoAtual >= window.ordemExibicao.length) { 
-          finalizarEEnviarProva(); 
-          return; 
-      }
+    function renderizarQuestao() {
+      if (window.passoAtual >= window.ordemExibicao.length) { finalizarEEnviarProva(); return; }
       
-      // Pega o número original da questão na planilha/caderno
       let indiceReal = window.ordemExibicao[window.passoAtual];
       const q = cadernoAtivo.questoesOriginal[indiceReal];
       tempoRestante = parseInt(q.tempo || 60);
       
-      // Exibição do progresso total de forma transparente para o aluno
       let totalQuestoes = cadernoAtivo.questoesOriginal.length;
       let jaRespondidas = respostasAluno.filter(r => !eRespostaVazia(r)).length;
       let numAtualExibicao = jaRespondidas + 1;
@@ -561,7 +462,6 @@ function renderizarQuestao() {
       if (q.tipo === "multipla_escolha") {
         ['A','B','C','D','E'].forEach(l => { 
             if(q.opcoes && q.opcoes[l]) { 
-                // CORREÇÃO DO ALINHAMENTO APLICADA AQUI (FLEXBOX)
                 html += `<div class="d-flex align-items-center mb-3 p-3 bg-light rounded border hover-shadow"><input class="form-check-input m-0 me-3 flex-shrink-0" type="radio" name="respProva" value="${l}" id="opt_${l}" onclick="verificarPreenchimento()"><label class="form-check-label text-dark w-100 mb-0" for="opt_${l}" style="cursor:pointer;"><strong>${l})</strong> ${q.opcoes[l]}</label></div>`; 
             }
         });
@@ -578,7 +478,6 @@ function renderizarQuestao() {
         ];
         assOpcoes.forEach(op => { html += `<div class="form-check mb-3 p-3 rounded bg-light border"><input class="form-check-input ms-1 me-3 mt-1" type="radio" name="respProva" value="${op.v}" id="ass_${op.v}" onclick="verificarPreenchimento()"><label class="form-check-label" for="ass_${op.v}" style="cursor:pointer;">${op.t}</label></div>`; });
       } else if (q.tipo === "associacao") {
-        // CORREÇÃO DOS TÍTULOS COLUNA A E B APLICADA AQUI
         html += `<div class="row g-4"><div class="col-sm-5 border-end pe-4"><h6 class="text-muted fw-bold text-center mb-3">Coluna A</h6>`; 
         (q.colunaA || []).forEach((item, idx) => { html += `<div class="mb-3 text-dark p-3 bg-light rounded border shadow-sm"><strong>${idx+1}.</strong> ${item}</div>`; }); 
         html += `</div><div class="col-sm-7 ps-4"><h6 class="text-muted fw-bold text-center mb-3">Coluna B</h6>`;
@@ -604,7 +503,6 @@ function renderizarQuestao() {
       
       clearInterval(timerIntervalo);
       timerIntervalo = setInterval(tickTempo, 1000);
-      
       verificarPreenchimento();
     }
 
@@ -624,7 +522,6 @@ function renderizarQuestao() {
 
     function verificarPreenchimento() {
       if(tempoRestante > 0) return; 
-      
       let respondeu = false;
       const radios = document.querySelectorAll('#areaQuestaoAtiva input[type="radio"]:checked');
       const inputs = document.querySelectorAll('#areaQuestaoAtiva input[type="text"], #areaQuestaoAtiva textarea');
@@ -637,8 +534,8 @@ function renderizarQuestao() {
       }
 
       let eUltima = (window.passoAtual === window.ordemExibicao.length - 1);
-
       const btn = document.getElementById('btnAvancar');
+      
       if(respondeu || (radios.length === 0 && inputs.length === 0)) { 
         btn.disabled = false;
         btn.style.backgroundColor = "var(--sucesso)";
@@ -651,46 +548,30 @@ function renderizarQuestao() {
       }
     }
 
-    // =========================================================================
-    // CAPTURAR RESPOSTA: Salva no índice exato da questão na prova
-    // =========================================================================
     function capturarRespostaAtual() {
       if (window.passoAtual >= window.ordemExibicao.length) return;
-      
       let indiceReal = window.ordemExibicao[window.passoAtual];
       const q = cadernoAtivo.questoesOriginal[indiceReal];
       
       if(["multipla_escolha", "certo_errado", "assercao_razao"].includes(q.tipo)) {
         const rad = document.querySelector('input[name="respProva"]:checked');
-        if(rad) {
-            respostasAluno[indiceReal] = rad.value;
-        }
+        if(rad) respostasAluno[indiceReal] = rad.value;
       } else {
         const inputs = document.querySelectorAll('.in-teste');
         if(inputs.length > 0) {
             let vals = []; 
             inputs.forEach(i => vals.push(i.value.trim().toUpperCase()));
             let textoResp = vals.join(", ");
-            if (!eRespostaVazia(textoResp)) {
-                respostasAluno[indiceReal] = textoResp;
-            }
+            if (!eRespostaVazia(textoResp)) respostasAluno[indiceReal] = textoResp;
         }
       }
     }
 
-    // =========================================================================
-    // AVANÇAR QUESTEÃO E PAUSAR/GUARDAR
-    // =========================================================================
     function avancarQuestao() {
       capturarRespostaAtual();
-      
       window.passoAtual++; 
-      
-      if (window.passoAtual >= window.ordemExibicao.length) {
-          finalizarEEnviarProva();
-      } else {
-          renderizarQuestao();
-      }
+      if (window.passoAtual >= window.ordemExibicao.length) finalizarEEnviarProva();
+      else renderizarQuestao();
     }
 
     function pausarEGuardar() {
@@ -706,24 +587,11 @@ function renderizarQuestao() {
       }).then((result) => {
           if(result.isConfirmed) {
               clearInterval(timerIntervalo);
-              
-              // Captura a questão atual se o aluno respondeu
               capturarRespostaAtual();
-              
               Swal.fire({ title: 'Salvando no servidor...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
-              let pacoteEnvio = {
-                  api: 'salvarProgresso',
-                  linhaPlanilha: cadernoAtivo.linhaPlanilha,
-                  respostas: respostasAluno,
-                  tempoRestante: tempoRestante
-              };
-
-              fetch(URL_API_GOOGLE, { 
-                  method: 'POST', 
-                  headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                  body: JSON.stringify(pacoteEnvio) 
-              })
+              let pacoteEnvio = { api: 'salvarProgresso', linhaPlanilha: cadernoAtivo.linhaPlanilha, respostas: respostasAluno, tempoRestante: tempoRestante };
+              fetch(URL_API_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(pacoteEnvio) })
               .then(res => res.json()).then(resp => {
                   Swal.fire('Salvo!', 'Você já pode sair. Suas respostas estão seguras.', 'success').then(() => {
                       alternarTela('telaDashboard');
@@ -734,9 +602,6 @@ function renderizarQuestao() {
       });
     }
 
-    // ====================================================================================
-    // CÁLCULO DE NOTA ATUALIZADO (10 PONTOS DIVIDIDOS PELO NÚMERO DE QUESTÕES)
-    // ====================================================================================
     function finalizarEEnviarProva() {
       Swal.fire({ title: 'Finalizando...', text: 'Corrigindo a atividade e enviando ao professor.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
@@ -760,29 +625,17 @@ function renderizarQuestao() {
         } else {
           let respEsp = q.resposta || "";
           if(q.tipo === 'assercao_razao') { let mapR = {"A":"I", "B":"II", "C":"III", "D":"IV", "E":"V"}; if(mapR[respEsp]) respEsp = mapR[respEsp]; }
-          // Conta acerto se for exatamente igual e se não estiver em branco
-          if(respAluno.replace(/\s/g, '').toLowerCase() === respEsp.replace(/\s/g, '').toLowerCase() && respAluno !== "") {
-             acertoFracao = 1;
-          }
+          if(respAluno.replace(/\s/g, '').toLowerCase() === respEsp.replace(/\s/g, '').toLowerCase() && respAluno !== "") acertoFracao = 1;
         }
-        
         somaAcertos += acertoFracao; 
       });
 
       let valorPorQuestao = 10 / totalQuestoes;
       let notaFinalCalculada = somaAcertos * valorPorQuestao;
-      
       let notaFormatada = notaFinalCalculada.toFixed(1).replace('.0', '');
       let notaString = notaFormatada + "|" + somaAcertos + "/" + totalQuestoes;
       
-      let pacoteEnvio = { 
-          api: 'finalizarAtividade', 
-          linhaPlanilha: cadernoAtivo.linhaPlanilha, 
-          respostas: respostasAluno, 
-          notaFinal: notaString, 
-          tempoRestante: 0 
-      };
-
+      let pacoteEnvio = { api: 'finalizarAtividade', linhaPlanilha: cadernoAtivo.linhaPlanilha, respostas: respostasAluno, notaFinal: notaString, tempoRestante: 0 };
       fetch(URL_API_GOOGLE, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(pacoteEnvio) })
       .then(res => res.json()).then(resp => {
          if (resp.sucesso) {
@@ -821,29 +674,20 @@ function renderizarQuestao() {
                 
                 let percentualItem = gruposChaves.length > 0 ? (encontradas / gruposChaves.length) : 0;
                 
-                if (percentualItem >= 0.8) { 
-                    status = "100% Contemplada (Excelente)"; corStatusHex = "var(--sucesso)"; icone = "<i class='fas fa-star text-white'></i>"; 
-                } else if (percentualItem >= 0.5) { 
-                    status = "Contemplada (Satisfatório)"; corStatusHex = "#0EA5E9"; icone = "<i class='fas fa-check text-white'></i>"; 
-                } else if (percentualItem >= 0.25) { 
-                    status = "Parcialmente Contemplada"; corStatusHex = "var(--secundaria)"; icone = "<i class='fas fa-exclamation-triangle text-dark'></i>"; 
-                } else { 
-                    status = "Não Contemplada (Insatisfatório)"; corStatusHex = "var(--perigo)"; icone = "<i class='fas fa-times text-white'></i>"; 
-                }
+                if (percentualItem >= 0.8) { status = "100% Contemplada (Excelente)"; corStatusHex = "var(--sucesso)"; icone = "<i class='fas fa-star text-white'></i>"; }
+                else if (percentualItem >= 0.5) { status = "Contemplada (Satisfatório)"; corStatusHex = "#0EA5E9"; icone = "<i class='fas fa-check text-white'></i>"; }
+                else if (percentualItem >= 0.25) { status = "Parcialmente Contemplada"; corStatusHex = "var(--secundaria)"; icone = "<i class='fas fa-exclamation-triangle text-dark'></i>"; }
+                else { status = "Não Contemplada (Insatisfatório)"; corStatusHex = "var(--perigo)"; icone = "<i class='fas fa-times text-white'></i>"; }
             } else {
                 if(q.tipo === 'assercao_razao') {
                     let mapRetro = {"A":"I", "B":"II", "C":"III", "D":"IV", "E":"V"};
                     if(mapRetro[respEsperadaParaExibir]) respEsperadaParaExibir = mapRetro[respEsperadaParaExibir];
                 }
-
                 let aLimpo = respAluno.replace(/\s/g, '').toLowerCase(); 
                 let gLimpo = respEsperadaParaExibir.replace(/\s/g, '').toLowerCase();
                 
-                if(aLimpo === gLimpo && aLimpo !== "") { 
-                    status = "Exato (Acertou)"; corStatusHex = "var(--sucesso)"; icone = "<i class='fas fa-check-circle text-white'></i>"; 
-                } else { 
-                    status = "Incorreto (Errou)"; corStatusHex = "var(--perigo)"; icone = "<i class='fas fa-times-circle text-white'></i>"; 
-                }
+                if(aLimpo === gLimpo && aLimpo !== "") { status = "Exato (Acertou)"; corStatusHex = "var(--sucesso)"; icone = "<i class='fas fa-check-circle text-white'></i>"; }
+                else { status = "Incorreto (Errou)"; corStatusHex = "var(--perigo)"; icone = "<i class='fas fa-times-circle text-white'></i>"; }
             }
 
             let textColorForBadge = corStatusHex === "var(--secundaria)" ? "#000" : "#fff";
@@ -864,14 +708,11 @@ function renderizarQuestao() {
                         </div>
                     </div>
                     <div class="mt-4 text-end">
-                        <span class="badge px-4 py-2 shadow-sm" style="background-color: ${corStatusHex}; color: ${textColorForBadge}; border-radius: 50px; font-size: 14px;">
-                            ${icone} ${status}
-                        </span>
+                        <span class="badge px-4 py-2 shadow-sm" style="background-color: ${corStatusHex}; color: ${textColorForBadge}; border-radius: 50px; font-size: 14px;">${icone} ${status}</span>
                     </div>
                 </div>
             </div>`;
         });
-
         document.getElementById('areaRelatorioCorrecao').innerHTML = htmlGabarito;
         alternarTela('telaCorrecao');
     }
